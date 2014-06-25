@@ -1,0 +1,104 @@
+---
+layout: post
+title:  "Curriculum Vitae"
+date:   2014-06-25 13:28:03
+categories: resume
+---
+
+Christopher Atkins
+@CAIndy
+christopher-atkins.com
+
+Current Work
+============
+* iOS video messaging application called Hello (hellothen.com)
+* F# Poker application (github.com/caindy/fspoker)
+* Hyperobjects.org
+
+Previous Experience
+===================
+
+Snap One, Principal Engineer
+-----------------------------------
+Designed and Implemented:
+
+* a file sync engine, 
+* authentication/authorization API, 
+* fully RESTful photo sharing and management backend, 
+* supported and extended legacy photo book application
+Tech: .NET (C#/F#), WCF, Silverlight, AWS, SQL Server, ServiceStack, git, Powershell, some Rails
+
+Independent
+-----------
+Sub-contractor to develop irrigation and farm implement asset management
+
+Tech: ASP.NET MVC, C#, Google Maps, jQuery
+
+Thoughtworks, Senior Consultant
+---------------------------------------
+* Development/Architectural lead for medical content authoring tool
+  * AJAX Validation using server-side DDD models
+  * ExtJs event-driven validation
+  * Introduced continuous delivery
+  * Tech: C#, ASP.NET, jQuery, Sencha, Powershell, SQL Server
+* Major Air Carrier website
+  * Front-end performanced enhancement program, including:
+    * Implemented and systematized most PageSpeed suggestions
+    * Put page speed score into automated testing and in build radiator
+  * Implemented an internal quality improvement technique called ratcheting
+  * Implemented a contest management solution in Grails
+  * Tech: Ubuntu, EJB, JSP, Grails, Apache, PageSpeed, git
+
+Independent
+-----------
+* Ported an electronic signing application for a major private educator
+  * Classic EJB app was ported to ASP.NET/WCF
+  * Memory requirements for peak load reduced from 16GB to 4GB
+* Industry-leading Self-Publishing Platform
+  * Introduced agile/XP practices
+  * Designed and Implemented an event-driven SOA for backend services
+  * Created a single sign-on solution across brands
+  * Led a team to maintain and enhance a self-service brand
+  * Implemented an AJAX book cover designer
+  * Implemented a constraint-solver backed workflow engine
+Tech: ASP.NET, WCF, jQuery, Rx, SQL Server (CLR UDF), CruiseControl.NET, MbUnit, WATiR, TFS, Powershell
+
+E-gineering, Senior Consultant
+--------------------------------
+* Designed and built an analytics platform for automotive dealerships
+* Insurance Quoting system engineer-in-test
+Tech: ASP.NET, Infragistics, SQL Server, DB2, Rational Robot, Stylus Studio, ClearQuest
+
+Independent
+-----------
+* Freelance MCT
+* Staff aug at HR/benefits consulting firm
+Tech: VB6, C#, VB.NET, ASP.NET, SQL Server
+
+Cayman Consulting/FAST Software, Developer Manager
+----------------------------------------------------
+* Lead development/architecture and managed developers
+* Automotive CRM development
+* Small Banking CRM
+Tech: C#, Windows Forms, .NET Remoting, XML/XSLT, SQL Server, Infragistics
+
+Kizan Consulting, Senior Consultant
+-------------------------------------
+* Supported existing consulting clients
+* Wrote and delivered training
+* Wrote a security auditing tool to attack SQL Servers
+Tech: Windows DNA, VB5/6, ASP/ASP.NET, COM+, Netware, Access, SQL Server, Active Directory, LDAP/ADONETS 
+
+Vobix, Developer
+------------------
+* Virtual Hosting System for Training
+* Multi-tenant Application Hosting Platform
+* Web-based CMS
+Tech: VB6/ASP, LDAP, SQL Server, VMWare ESX, SOAP Toolkit, Perl, SOAP::Lite
+
+Patriot Homes, Developer
+--------------------------
+Designed and implemented a costing application to construct and price a bill of materials via web-browser
+Tech: VB6, SQL Server, ASP, XML Data Islands, IE Behaviors
+
+
