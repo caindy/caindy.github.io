@@ -24,7 +24,7 @@ brew untap railwaycat/emacsmacport
 {% endhighlight %}
 
 
-So, now you've call a well-maintained version of Emac for your Mac. Now, we're going to "install" Spacemacs:
+So, now you've call a well-maintained version of Emacs for your Mac. Now, we're going to "install" Spacemacs:
 {% highlight bash %}
 git clone --recursive https://github.com/syl20bnr/spacemacs ~/.emacs.d
 {% endhighlight %}
@@ -86,4 +86,7 @@ Some of the layers I'm really digging include `javascript` and `elixir`. I've st
 ## Next Steps
 There is a *ton* to learn, but I think it's an investment that will pay off. I'm going to start using Spacemacs as my primary editor as much as possible. There are C# and F# layers that I hope will make that possible, and I'll be using the VMWare shared folder feature to edit the files in Spacemacs in OSX, then switch over to the Windows VM to compile and such. Besides that, I'd like to develop more proficiency with macros; stuff like this is just cool:
 <blockquote class="twitter-tweet" lang="en"><p lang="en" dir="ltr"><a href="https://twitter.com/CAIndy">@CAIndy</a> <a href="https://twitter.com/bodil">@bodil</a> <a href="https://twitter.com/spacemacs">@spacemacs</a> Try this. Record a macro, Vim-style. Then do `SPC :` `kmacro-edit-macro`. Be amazed.</p>&mdash; deech (@deech) <a href="https://twitter.com/deech/status/616217205181652992">July 1, 2015</a></blockquote>
+
+# Afteword
+I mentioned in the introduction that I'm learning Spacemacs in no small part because other folks I admire use Emacs. My ultimate hope is that I will gain enough productivity to be able to produce OSS at the levels they do. My existential angst came from the feeling that having invested the kind of time required, I'll have committed myself to being a certain kind of person--a hacker--but in truth, I made that decision long ago.
 <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
