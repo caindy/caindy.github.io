@@ -1,11 +1,10 @@
 ---
 layout: post
 title:  "Beginning Spacemacs"
-date:   2014-06-25 13:28:03
+date:   2015-07-18 13:02:00 +0400
 permalink: begin-spacemacs
-categories: learning
+categories: learning editors
 ---
-
 
 # And So It Begins
 <blockquote class="twitter-tweet" lang="en"><p lang="en" dir="ltr">Began learning emacs via <a href="https://twitter.com/spacemacs">@spacemacs</a> Just had a strong sense of existential angst, as if by going further my life will be irrevocably altered</p>&mdash; Christopher Atkins (@CAIndy) <a href="https://twitter.com/CAIndy/status/615702309805256704">June 30, 2015</a></blockquote>
@@ -62,11 +61,13 @@ export TERM=xterm-256color
 {% endhighlight %}
 
 Cool, one last thing for this getting started note; get your OSX layer working. It's pretty simple:
+
 - `brew install coreutils` to get `gls`
 - then add the `osx` spacemacs layer 
 
 # Exploring
 Spacemacs layers are all about making the Emacs ecosystem available via `vim`-style keybindings, but they're also a well-curated bundling of Emacs modes. I mentioned being a `vim` novice, but I did pick up a few tricks from Chris McCord. I used `CtrlP` and `NerdTree` via `vundler`. Spacemacs comes with `helm` and `Neotree` out of the box. Some commands I've been using a lot are:
+
 - `Spc f r` recently used
 - `Spc p t` toggles a `NerdTree` at the project root (it's smart like that)
 - `Spc t ...` there are a lot of cool toggles here, various kinds of highlight, relative line numbers, etc.
