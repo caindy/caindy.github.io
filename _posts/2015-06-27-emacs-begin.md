@@ -83,6 +83,9 @@ I'm pretty comfortable with `git`. I've been using it since 2009, but only truly
 ## Languages
 Some of the layers I'm really digging include `javascript` and `elixir`. I've still got some kinks to workout, but I can't imagine using another tool to program in these languages now.
 
+### Dash
+I'd heard about [Dash](https://kapeli.com/dash) before but not gotten into the habit if using it; the eponymous layer in Spacemacs will change that, I think.
+
 ## Next Steps
 There is a *ton* to learn, but I think it's an investment that will pay off. I'm going to start using Spacemacs as my primary editor as much as possible. There are C# and F# layers that I hope will make that possible, and I'll be using the VMWare shared folder feature to edit the files in Spacemacs in OSX, then switch over to the Windows VM to compile and such. Besides that, I'd like to develop more proficiency with macros; stuff like this is just cool:
 <blockquote class="twitter-tweet" lang="en"><p lang="en" dir="ltr"><a href="https://twitter.com/CAIndy">@CAIndy</a> <a href="https://twitter.com/bodil">@bodil</a> <a href="https://twitter.com/spacemacs">@spacemacs</a> Try this. Record a macro, Vim-style. Then do `SPC :` `kmacro-edit-macro`. Be amazed.</p>&mdash; deech (@deech) <a href="https://twitter.com/deech/status/616217205181652992">July 1, 2015</a></blockquote>
