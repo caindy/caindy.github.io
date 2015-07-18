@@ -10,7 +10,10 @@ categories: learning editors
 <blockquote class="twitter-tweet" lang="en"><p lang="en" dir="ltr">Began learning emacs via <a href="https://twitter.com/spacemacs">@spacemacs</a> Just had a strong sense of existential angst, as if by going further my life will be irrevocably altered</p>&mdash; Christopher Atkins (@CAIndy) <a href="https://twitter.com/CAIndy/status/615702309805256704">June 30, 2015</a></blockquote>
 
 # So You Wanna Learn Emacs?
-A little background about my (lack of) `vim` skills. I use `vim` keybindings quite a bit in Visual Studio, via VsVim (thanks Jared Par!), however I'm really a novice, despite heavy usage of the most basic commands. I started my programming career during the dotcom era and found my way into the industry with very little formal training due to that huge supply-side shortfall in the talent market. Over the years I've done a lot of independent professional study, having learned a few languages, but I've not really invested in learning tools outside of Visual Studio and Resharper. The latter I picked up as a Thoughtworker, along with intense use of `git`. At LambdaConf this year I met Andrew Cherry (@kolektiv) and in the course of discussing all things F#, he mentioned that he does most of his development on OSX in Emacs; I'd always intended to make an earnest attempt to learn the same, but this renewed my resolve. So, here I am.
+> The best editor is [...] Emacs *and* Vim! -[Spacemacs](https://github.com/syl20bnr/spacemacs)
+
+## How I Got Here
+A little background about my (lack of) `vim` skills. I use `vim` keybindings quite a bit in Visual Studio, via VsVim (thanks Jared Par!), however I'm really a novice, despite heavy usage of the most basic commands. Over the years I've invested in learning tools like Resharper to speed up my development, but at LambdaConf this year I met Andrew Cherry (@kolektiv) and in the course of discussing all things F#, he mentioned that he does most of his development on OSX in Emacs. Then I saw that Chris McCord of Phoenix fame had moved from Vim to Emacs Evil mode. I'd always intended to make an earnest attempt to learn the same, but this renewed my resolve. I didn't want to lose all the things I learned in Vim, so Spacemacs FTW!
 
 # Getting Started
 Like a lot of folks, I work on a Macbook Pro. Here's some prerequisites for getting started with Spacemacs:
