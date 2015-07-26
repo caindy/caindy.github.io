@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Curriculum Vitae"
-date:   2014-06-25 13:28:03
+date:   2015-07-21 11:30:00 +0400
 permalink: cv
 categories: resume
 ---
@@ -15,15 +15,27 @@ Current Work
 Previous Experience
 ===================
 
+RelayFoods.com, Software Systems Designer
+-----------------------------------
+In an extremely multi-faceted role with responsibilities including from devops, interaction design, and enterprise architecture, designed and implemented:
+
+* distributed hypermedia-event system leveraging AWS Kinesis and Lambda
+* Intent-driven, event-sourced microservices architecture in F#/ASP.NET WebApi
+* Meal planning experience
+** dynamic ingredient parser leveraging NLP: units of measure parsed, ingredients matched via search
+** "stoichiometric" minimization across recipes in a purchase
+
+Tech: .NET tech including F# and WebApi; AWS DynamoDb, Lambda, and Kinesis; Stanford NLP
+
 Snap One, Principal Engineer
 -----------------------------------
 Designed and Implemented:
 
-* a file sync engine, 
-* authentication/authorization API, 
-* fully RESTful photo sharing and management backend, 
+* a file sync engine on Windows using Rx, leveraging rsync;
+* in-house authentication/authorization API, refactored from legacy API, no breaking changes;
+* REST photo sharing and management backend that aggregated multiple photo sharing services
 
-Supported and extended legacy photo book application
+Initiallly hired to support and extend legacy photo book application but was promoted twice
 
 Tech: .NET (C#/F#), WCF, Silverlight, AWS, SQL Server, ServiceStack, git, Powershell, some Rails
 
