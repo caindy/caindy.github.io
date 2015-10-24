@@ -24,13 +24,13 @@ Introduction
 
 URL Anatomy
 ----------
-URLs are _not_ opaque identifiers
+URLs are translucent identifiers.
 
 > http://bounded-context/logical-aggregate/aggregate-root-entity-id/
 
 - DNS host name --> bounded context
 - logical aggregate --> DDD aggregate
-- entity id --> UUIDv4
+- entity id --> UUIDv4, therefore not guessable and do not disclose info
 
 Logical Aggregate
 ---------------
@@ -124,7 +124,8 @@ applied to the current `State` which is then returned as a `Representation`
 - __parse__: supplied intent message is parsed and a formal Intent is created;
   returns `400 Bad Request` if a formal Intent cannot be parsed
 - __authorize__: (implicit __get__ of current state) returns `403 Forbidden` if
-  necessary, `410 Gone` if Aggregate Root has been `archived`
+necessary, `410 Gone` if Aggregate Root has been `archived`, and `401 Unauthorized`
+in cases where a security credential is required but not present
 - __conjugate__&ast;: `Intent -> Event` Conjugate is a term borrowed from
 grammar and chemistry. In studying foreign languages, we will often learn to
 conjugate verbs from the present tense to e.g. the past tense. This is exactly
@@ -133,7 +134,8 @@ hews to the Latin morphology of "yoked together"; there it means "to be combined
 with or joined reversibly". *Certain properties of Intents (trackingId?
 activity?) are stored with the Event,* allowing them to be correlated.
 - __apply__: `State + Event -> State?` return `409 Conflict` if the `Event`
-  could not be applied
+could not be applied, e.g. the Aggregate's FSM doesn't support the event
+at this point
 - __store__: append Event to durable storage
 - __project__:
 
@@ -252,4 +254,6 @@ No Transactor
 -------------
 Unlike Datomic, there is no central transactor component, i.e. there is no
 coordination of reads or writes among the various servers hosting the
-Hyperobject.
+Hyperobject. This is possible because the consistent hashing router, and we
+accept that a subset of aggregates will be unavailable if a node goes down. As
+Joe Armstrong says, availability and horizontal scalability are the same thing.
