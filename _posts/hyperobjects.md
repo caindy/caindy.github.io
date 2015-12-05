@@ -178,6 +178,8 @@ is constrained to just one resource. Succinctly, you can POST/POSIT an array of 
 You can also POST/POSIT a multiplexed Intent, i.e. a message that contains orthogonal batches, to an
 Aggregate Root/Revision.
 `413 Request Entity Too Large` if [DynamoDb limits](http://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_BatchWriteItem.html)
+
+### Batch
 ### Use Cases
 #### POSIT alternative futures
 #### POSIT alternate FORK
@@ -216,6 +218,8 @@ Write Guarantees
 Ultimately, so much depends on the backing data store. Hyperobjects are more of
 an architectural style than a tech stack. This first implementation uses the
 amazing AWS DynamoDb. Concordantly, we have to accept very specific tradeoffs.
+Importantly, we might see throttling due to
+[hot keys](https://medium.com/medium-eng/how-medium-detects-hotspots-in-dynamodb-using-elasticsearch-logstash-and-kibana-aaa3d6632cfd).
 
 ### ACID
 Mutations to an Aggregate Root are always serialized. Reads are consistent as of
