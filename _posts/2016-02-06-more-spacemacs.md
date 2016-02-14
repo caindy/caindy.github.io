@@ -6,11 +6,11 @@ permalink: more-spacemacs
 categories: learning editors
 ---
 
-| Keys       | Layer  | Effect
-|-------------------------------------|
-| `SPC :`    | smex   | Emacs command |
-| `m` letter | evil   | mark location |
-| `;` `;`    |  ??    | comment line  |
+| Keys            | Layer       | Effect
+|-----------------------------------------------|
+| `SPC :`         | smex        | Emacs command |
+| `m` letter      | evil        | mark location |
+| `;` `;`         |  ??         | comment line  |
 
 
 Inter-file Navigation 
