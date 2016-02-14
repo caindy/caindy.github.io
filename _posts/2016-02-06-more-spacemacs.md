@@ -7,7 +7,7 @@ categories: learning editors
 ---
 
 | Keys            | Layer       | Effect
-|-----------------------------------------------|
+|:----------------|:-----------:|--------------:|
 | `SPC :`         | smex        | Emacs command |
 | `m` letter      | evil        | mark location |
 | `;` `;`         |  ??         | comment line  |
@@ -33,7 +33,7 @@ Eyebrowse layer allows `SPC W` then a number to create/navigate to a new workspa
 with Eybrwose working you can using Vim's `gt` and `gT` to 
 
 Editing
-Select some text, then `s <char>` will surround with <char>
+Select some text, then `s <char>` will surround with `<char>`
 iedit, get a selection (the whole current symbol by default) then `SPC s e` to enter
 iedit mode, allowing you to edit all the matched things at once
 `SPC ; ;` toggle line comment
