@@ -6,7 +6,12 @@ permalink: more-spacemacs
 categories: learning editors
 ---
 
-`M-x` invokes smex (find Emacs commands)
+| Keys       | Layer  | Effect
+|-------------------------------------|
+| `SPC :`    | smex   | Emacs command |
+| `m` letter | evil   | mark location |
+| `;` `;`    |  ??    | comment line  |
+
 
 Inter-file Navigation 
 `SPC b b` open Helm mini-buffer
@@ -14,7 +19,7 @@ Inter-file Navigation
 `SPC p f` Projectile find files 
 `SPC p p` Projectile find project
 
-Consider using the Ranger layer (file manager)
+Using the Ranger layer (file manager)
 invoked using `SPC a r` (applications ranger)
 Consier using Unimpaired layer (tpope quick cycling)
 Consider using Fasd layer to complement [Fasd](https://github.com/clvv/fasd)
