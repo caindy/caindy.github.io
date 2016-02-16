@@ -38,6 +38,7 @@ iedit, get a selection (the whole current symbol by default) then `SPC s e` to e
 iedit mode, allowing you to edit all the matched things at once
 `SPC ; ;` toggle line comment
 [Diacritics in Emacs](https://www.masteringemacs.org/article/diacritics-in-emacs)
+`C-x 8 ' e` to creates *é*
 
 Help
 `SPC h d` invokes "help describe", providing access to multipe ways of find help 
@@ -50,3 +51,4 @@ Future layers to explore
 OrgMode + Capture mode
 Abbrev mode 
 
+[Editorconfig](http://editorconfig.org/) layer to manage things like indent and such
