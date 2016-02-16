@@ -37,6 +37,7 @@ Select some text, then `s <char>` will surround with `<char>`
 iedit, get a selection (the whole current symbol by default) then `SPC s e` to enter
 iedit mode, allowing you to edit all the matched things at once
 `SPC ; ;` toggle line comment
+[Diacritics in Emacs](https://www.masteringemacs.org/article/diacritics-in-emacs)
 
 Help
 `SPC h d` invokes "help describe", providing access to multipe ways of find help 
