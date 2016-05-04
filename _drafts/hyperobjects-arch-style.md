@@ -164,17 +164,17 @@ All Hyperobjects URLs are translucent identifiers with regular structure that de
 constituent API surfaces.
 
 - Bounded Context
-  > https://*consumer-shopping-context.contoso.com*/
+  https\://*consumer-shopping-context.contoso.com*/
   Exposes service metadata (available Intents, Event Activities)
   Also serves as entry-point for interactive documentation
   
 - Aggregates
-  > https://consumer-shopping-context.contoso.com/*consumer-shopping-cart*/
+  https\://consumer-shopping-context.contoso.com/*consumer-shopping-cart*/
   Exposes Query surface for a Resource Type e.g. Shopping Carts
   Admits creation of new aggregate roots
 
 - Continuants
-  > https://consumer-shopping-context.contoso.com/consumer-shopping-cart/*42924579adkfajl32792i98f98*
+  https\://consumer-shopping-context.contoso.com/consumer-shopping-cart/*42924579adkfajl32792i98f98*
   Nominates the "current" version of a particular Aggregate Root
   Primary API surface, implements domain operations (i.e. POSTed Intents)
 
