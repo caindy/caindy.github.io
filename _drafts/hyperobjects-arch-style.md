@@ -207,38 +207,6 @@ Thus, every 200-level (successful) response contains a Representation of a
 particular *Revision* of an Aggregate Root. Both that revision and the Event that engendered the
 it can be identified by the Event-Time. 
 
-### Revisions and History
-
-Any exposed Aggregate Root State is really just a snapshot in time.
-You can GET a previous version by
-
-> http://bounded-context/logical-aggregate/aggregate-root-entity-id/revision-id
-
-These are always returned with an Expires header of one year hence, indicating
-it should *never* expire, per [RFC 2616, Sec. 14.21](http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.21)
-
-You can think of the following as being equivalent identifiers.
-
-> http://bounded-context/logical-aggregate/aggregate-root-entity-id/latest
-> http://bounded-context/logical-aggregate/aggregate-root-entity-id/
-
-In other words sending Intents to the latter is implicitly sending it to the
-latest revision.
-
-The first Revision is 0. To create an Aggregate Root, simply POST a create
-Intent to the Logical Aggregate. This first Revision of an Aggregate Root will
-generally look the same, but over time it could change as the Logical Aggregate
-redefines was empty/zero looks like (e.g. as business rules for default values
-evolve).
-
-### History
-You can also GET all the Events that have ever occurred to an Aggregate Root.
-
-> http://bounded-context/logical-aggregate/aggregate-root-entity-id/history
-> http://bounded-context/logical-aggregate/aggregate-root-entity-id/revision-id/history
-
-
-
 System-level
 ============
 
