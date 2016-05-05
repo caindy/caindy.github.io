@@ -75,7 +75,7 @@ specificity.
 
 Consider services like IFTTT or Zapier that enable non-trivial workflows to be
 built from simple webhook technologies. Our enterprise architectures should be
-at least as accomodating, allowing reactivity across various silos.
+at least as accommodating, allowing reactivity across various silos.
 
 At the application level, new requirements usually mean we need to present novel
 and disparate data, effecting new operations in myriad contexts. Technologies
@@ -96,9 +96,9 @@ software vendors. To a large extent, this option isn't available in the cloud;
 even so, it would obviate the benefits of running in the cloud.
 
 Instead we should seek to leverage the cloud offerings to satisfy our enterprise
-requirements, while enabling so-called cloud agility (ability to move between
-clouds and/or on-prem). To do so we need an enteprise architecture that can be
-served using PaaS offerings that are more or less homogenous across clouds.
+requirements, while keeping the cloud fungible, retaining ability to move between
+clouds and/or on-premises. To do so we need an enterprise architecture that can be
+served using PaaS offerings that are more or less homogeneous across clouds.
 
 Finally, the very nature of the cloud implies an architectural focus on
 scalability and a non-differentiation of service nodes. This is a fundamentally
@@ -109,7 +109,7 @@ Correctness
 -----------
 
 In recent years functional programming has made huge in-roads into mainstream
-software development practice. Concomittantly, ideas from FP like immutability
+software development practice. Concomitantly, ideas from FP like immutability
 have found their way into traditional enterprise OOP. Reactive Programming is
 driving many of the innovations in front-end development, and CRDTs are seeing
 broader adoption. Finally, testing techniques and tools abound alongside
@@ -118,7 +118,7 @@ testing, and other analysis techniques.
 
 The salient point in all of these examples is an emphasis on correctness,
 specifically on building confidence in the software we are shipping; a
-confidence that is pre-requisite to the enterprise agility promised by
+confidence that is prerequisite to the enterprise agility promised by
 continuous delivery. In particular state and time are hard; we want to make them
 easy by simplifying and rigorously controlling how they are handled.
 
@@ -166,7 +166,7 @@ Or,
 ### Intents
 
 Clients get work done by sending Command Messages to Services. These are called Intents
-to reflect both their provisionality (versus Command) and their role in the
+to reflect both their provisional nature (versus simply Command) and their role in the
 service design (capturing the intention of the user or system-actor).
 
 Intents are part of the Uniform Interface in that they define a standard
