@@ -27,7 +27,7 @@ as follows.
   * Exposes first-class Query operations
 * Hypermedia Event Messages as the engine of System state
 
-These constraints are combined with others selected from Domain-driven
+These constraints are combined with others selected from Domain-Driven
 Design, Vogel's Principles of Distributed Computing, Enterprise Integration
 Patterns, message-oriented programming, Representational State Tranfer, event
 sourcing, and stream processing.
@@ -63,6 +63,7 @@ The System-level architecture is modeled the principles outlined in Appendix A.
   - Fault tolerance and isolation
   - Elasticity / Scalability (in-memory, lock-free are consequences of physics)
   - Service-orientation and microservices
+  - DevOps (reduced specialization, use simples PaaS available)
 - Correctness
   - FP: Immutability, referential transparency, 
   - OOP: Conceptual relations
@@ -95,7 +96,7 @@ These Intents are part of the Uniform Interface in that they define a standard
 envelope format:
 
 - Activity Name: nominates the semantics for the Data property
-- Id: correlation identifier (see EIP) returned in the resource representation,
+- Id: correlation identifier (see EIP) returned in the Resource Representation,
   opaque to service
 - Data: a JSON object representing the Command Message 
 - Abriged Example:
@@ -122,12 +123,13 @@ The request processing pipeline of a Hyperobject looks like this:
 
 ```
 Parse     :: HTTP Request -> Intent?
-Conjugate :: Intent -> State -> Event
-Apply     :: Event  -> State -> State'
+Conjugate :: Intent -> State -> Event?
+Apply     :: Event  -> State -> State'?
 Store     :: Event  -> void
 Project   :: State' -> HTTP Response
 ```
-
+Outputs in question, e.g. `Intent?`, indicates a possible point of early exit from
+the pipeline shou
 #### Note on Durability
 
 Jim Gray "geoplex": clustered servers in same location
@@ -188,7 +190,8 @@ constituent API surfaces.
 Event-Time
 ----------
 Every write operation (processed Intent) on an Aggregate Root is linearized
-(TODO why?). As outlined above there are two effects in the processing environment:
+(TODO why? time-ordering requires a single arbiter of order). As outlined above
+there are two effects in the processing environment:
 
 * Encapsulated: the resultant Event is stored in a private (geoplexed) Event Log
   (eventually replicated into Event Stream)
@@ -212,6 +215,10 @@ System-level
 
 Universal Backplane
 -------------------
+
+"Distributed, Replicated Messaging"
+
+"What is an Event Hub?" "A high-scale, durable, distributed buffer"
 
 Domain Events
 + Service Lifecycle Events (announce availability?)
