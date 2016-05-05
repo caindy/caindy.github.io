@@ -276,8 +276,9 @@ vs ESB
 - Internal Elasticity
 - Buffer -> Downsort -> Receive Queues
 - *Event Message* pull model: "postcard" hypermedia events
+  - REST is designed for high demand, so EIP concern obviated
+  - pull model, *not RPC* simplifies idempotency
 - Domain Events + Service Lifecycle Events
-- pull model, *not RPC*
 
 ### Provisioning
 
