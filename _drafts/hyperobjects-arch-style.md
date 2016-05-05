@@ -29,15 +29,17 @@ characteristic constraints of this style are as follows.
   * Exposes first-class Query operations
 * Command Query Responsibility Segregation
 
-These constraints are combined with others selected from Domain-Driven
-Design, Vogel's Principles of Distributed Computing, Enterprise Integration
-Patterns, message-oriented programming, Representational State Transfer, event
-sourcing, and stream processing.
+These constraints are combined with others selected from Domain-Driven Design,
+Vogel's Principles of Distributed Computing, Enterprise Integration Patterns,
+message-oriented programming, Representational State Transfer, event sourcing,
+and stream processing.
 
-The style is described at two levels: the System-level and the
-Service-level. The System-level describes the style as an
-enterprise architecture, whereas the Service-level describes the constraints and
-behaviors of component services within the enterprise architecture.
+The style is described at two levels: the System-level and the Service-level.
+The System-level describes the style as an enterprise architecture, whereas the
+Service-level describes the constraints and behaviors of component services
+within the enterprise architecture. The design space inhabited by this style,
+distributed enterprise systems, necessarily constrains both the services and the
+operating environment in which the interrelate.
 
 Contents
 --------
@@ -47,11 +49,11 @@ Contents
 2. System-level Architecture
 3. Discussion
 
-Implementation details are described in terms of modern web technologies; the
-reader is encouraged to generalize. A running example of a retail enterprise is
-used to frame the narrative. The System-level architecture is modeled on the
-principles outlined in Appendix A. A Service-level implementation is described
-in Appendix B.
+Implementation details are described in terms of common web technologies (JSON,
+HTTP, etc.); the reader is encouraged to generalize. A running example of a
+retail enterprise is used to frame the narrative. The System-level architecture
+is modeled on the principles outlined in Appendix A. A Service-level
+implementation is described in Appendix B.
 
 Motivation
 ==========
@@ -61,24 +63,27 @@ fostering serendipity, enterprise architecture in the cloud, and correctness.
 
 Foster Serendipity
 ------------------
-This verbiage is borrowed from Steve Vinoski. Eric Evan's calls it supple architecture. The
-idea is that our software architectures should foster an environment where new
-requirements are simple and easy to satisfy. At the enterprise level, such
-properties included discoverability and uniformity, while the application or
-service level requires composability and specificity.
+
+This verbiage is borrowed from a Steve Vinoski talk about REST. Eric Evan's
+calls it supple architecture. The idea is that our software architectures should
+foster an environment where new requirements are simple and easy to satisfy. At
+the enterprise level, such properties included discoverability and uniformity,
+while the application or service level requires composability and specificity.
 
 Consider services like IFTTT or Zapier that enable non-trivial workflows to be
 built from simple webhook technologies. Our enterprise architectures should be
 at least as accomodating, allowing reactivity across various silos.
 
-At the application level, new requirements usually mean we need to present
-novel and disparate data, effecting new operations in myriad contexts. Technologies like Falcor and
-Relay have ushered in so-called demand-driven development, while companies like
-AWS and Netflix have shown the advantages of creating top-level services that
-aggregate baseline services to provide agility in the application layer.
+At the application level, new requirements usually mean we need to present novel
+and disparate data, effecting new operations in myriad contexts. Technologies
+like Falcor and Relay have ushered in so-called demand-driven development, while
+companies like AWS and Netflix have shown the advantages of creating top-level
+services that aggregate baseline services to provide agility in the application
+layer.
 
 Enterprise Architecture in the Cloud
 ------------------------------------
+
 Non-functional requirements are those without which your system doesn't
 function. So, we should learn from the web and its denizens, we still need to
 apply a high degree of rigor. At the same time, the value equation has changed
@@ -89,8 +94,8 @@ even so, it would obviate the benefits of running in the cloud.
 
 Instead we should seek to leverage the cloud offerings to satisfy our enterprise
 requirements while freeing us from the tyranny of the enterprise hardware and
-software vendors. To do so we need an enteprise architecture that can be
-served using PaaS offerings that are more or less homogenous across clouds.
+software vendors. To do so we need an enteprise architecture that can be served
+using PaaS offerings that are more or less homogenous across clouds.
 
 Finally, the very nature of the cloud implies an architectural focus on
 scalability and a non-differentiation of service nodes. This is a fundamentally
