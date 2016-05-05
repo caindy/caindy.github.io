@@ -118,7 +118,9 @@ innovations, lifting these ideas into the systems architecture, to enable
 agility while helping to ensure correctness. Valuing simplicity, clarity and
 generality above all, just as in the practice of programming, we wish to resolve
 the tension between the cloud era realities like eventual consistency and
-irregular reachability with these desires.
+irregular reachability with these desires. Failure is normal in the cloud and
+our architecture for inter-service dependencies should obviate that concern for
+individual services.
 
 Service-level Architecture
 ==========================
@@ -177,8 +179,9 @@ Apply     :: Event  -> State -> State'?
 Store     :: Event  -> void
 Project   :: State' -> HTTP Response
 ```
-Outputs in question, e.g. `Intent?`, indicates a possible point of early exit from
-the pipeline shou
+Outputs in question, e.g. `Intent?`, indicate a possible point of early exit from
+the pipeline should the stage fail (i.e. malformed requests).
+
 #### Note on Durability
 
 Jim Gray "geoplex": clustered servers in same location
@@ -274,6 +277,7 @@ vs ESB
 - Buffer -> Downsort -> Receive Queues
 - *Event Message* pull model: "postcard" hypermedia events
 - Domain Events + Service Lifecycle Events
+- pull model, *not RPC*
 
 ### Provisioning
 
@@ -324,6 +328,15 @@ well-factored monolith, each bounded context should correspond to a RDBMS schema
 that serves both as a logical and security boundary. The event log acts as a
 global blackboard for each bounded context. Within a bounded context, normal
 transactional locking is used to ensure consistency.
+
+### Legacy Services and/or Monolithic Systems
+
+Similar to the advice given above for a greenfield monolith, you can introduce
+events into your monolith. First, write the events to the same store in a single transaction with
+the local update they signify. Then have a daemon process that replicates those
+events to the universal backplane. Care must be taken to preserve event
+semantics and not introduce asynchronous RPC. Factoring out concerns that are
+not domain-specific (e.g. email) is a great place to start.
 
 Appendix A: Principles of Distributed Computing
 ===============================================
