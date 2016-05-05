@@ -2,7 +2,7 @@
 TL;DR
 ======
 
-Build all of your (micro)services as event-sourced, RESTful Bounded Contexts with a
+Build all of your services as event-sourced, RESTful Bounded Contexts with a
 Uniform Interface of message-orientation and Event-Time semantics, then allow
 them to autonomously organize by emitting hypermedia events on a universal
 backplane. Aggregate these services as necessary to provide built-for-purpose
@@ -11,35 +11,36 @@ abstractions.
 Overview
 ========
 
-Hyperobjects is an architectural style for distributed systems. Besides the
-particular organization of components, the primary constraints of this style are
-as follows.
+Hyperobjects is an architectural style for distributed systems whose primary
+design objective is enabling simple, scalable, reliable enterprise-scale cloud
+architectures. Besides the particular organization of components, the primary
+characteristic constraints of this style are as follows.
 
+* Hypermedia Event Messages as the engine of System state
 * A uniform interface for all services that:
   * Models effectful operations as Intent messages that can be batched, allowing
     clients to synthesize new operations
-  * Incorporates time semantics for all observable values and behaviors
-    enabling:
+  * Incorporates uniform, logical time semantics for all observable values and
+    behaviors enabling:
     * point-in-time distributed consistency
     * entity timeline inspection
     * forking an entity from a previous point-in-time
     * safe "what-if" operations
   * Exposes first-class Query operations
-* Hypermedia Event Messages as the engine of System state
+* Command Query Responsibility Segregation
 
 These constraints are combined with others selected from Domain-Driven
 Design, Vogel's Principles of Distributed Computing, Enterprise Integration
-Patterns, message-oriented programming, Representational State Tranfer, event
+Patterns, message-oriented programming, Representational State Transfer, event
 sourcing, and stream processing.
 
-The architectural style is described at two levels: the System level and the
-Service level. The System level describes the style at the level of an
-enterprise architecture, whereas the Service level describes the constraints and
-behaviors of component services within the enterprise architecture. The
-Service-level architecture encompasses the primary contributions of this
-architectural style and is necessary to understand the System-level.
+The style is described at two levels: the System-level and the
+Service-level. The System-level describes the style as an
+enterprise architecture, whereas the Service-level describes the constraints and
+behaviors of component services within the enterprise architecture.
 
-Therefore, this document laid out in four parts:
+Contents
+--------
 
 0. Motivation
 1. Service-level Architecture
@@ -48,28 +49,76 @@ Therefore, this document laid out in four parts:
 
 Implementation details are described in terms of modern web technologies; the
 reader is encouraged to generalize. A running example of a retail enterprise is
-used to frame the narrative.
+used to frame the narrative. The System-level architecture is modeled on the
+principles outlined in Appendix A. A Service-level implementation is described
+in Appendix B.
 
 Motivation
 ==========
 
-The System-level architecture is modeled the principles outlined in Appendix A.
+There are three main themes to the concerns Hyperobjects aims to address:
+fostering serendipity, enterprise architecture in the cloud, and correctness.
 
-- Foster serendipity
-  - Enterprise integrations
-  - Client demands (scalable utility, layered architecture, demand-driven
-    development for commands and queries)
-- Cloud Native
-  - Fault tolerance and isolation
-  - Elasticity / Scalability (in-memory, lock-free are consequences of physics)
-  - Service-orientation and microservices
-  - DevOps (reduced specialization, use simples PaaS available)
-- Correctness
-  - FP: Immutability, referential transparency, 
-  - OOP: Conceptual relations
-  - Explicit model of time
-  - Simplicity, Clarity, Generality
+Foster Serendipity
+------------------
+This verbiage is borrowed from Steve Vinoski. Eric Evan's calls it supple architecture. The
+idea is that our software architectures should foster an environment where new
+requirements are simple and easy to satisfy. At the enterprise level, such
+properties included discoverability and uniformity, while the application or
+service level requires composability and specificity.
 
+Consider services like IFTTT or Zapier that enable non-trivial workflows to be
+built from simple webhook technologies. Our enterprise architectures should be
+at least as accomodating, allowing reactivity across various silos.
+
+At the application level, new requirements usually mean we need to present
+novel and disparate data, effecting new operations in myriad contexts. Technologies like Falcor and
+Relay have ushered in so-called demand-driven development, while companies like
+AWS and Netflix have shown the advantages of creating top-level services that
+aggregate baseline services to provide agility in the application layer.
+
+Enterprise Architecture in the Cloud
+------------------------------------
+Non-functional requirements are those without which your system doesn't
+function. So, we should learn from the web and its denizens, we still need to
+apply a high degree of rigor. At the same time, the value equation has changed
+with the cloud. Prior to the cloud era, the solution to our non-functional
+requirements often involved writing big checks to specialized hardware and
+software vendors. To a large extent, this option isn't available in the cloud;
+even so, it would obviate the benefits of running in the cloud.
+
+Instead we should seek to leverage the cloud offerings to satisfy our enterprise
+requirements while freeing us from the tyranny of the enterprise hardware and
+software vendors. To do so we need an enteprise architecture that can be
+served using PaaS offerings that are more or less homogenous across clouds.
+
+Finally, the very nature of the cloud implies an architectural focus on
+scalability and a non-differentiation of service nodes. This is a fundamentally
+different approach from matching hardware to our enterprise SLAs. Stateless,
+fungible service nodes have become the primary building block of the cloud.
+
+Correctness
+-----------
+
+In recent years functional programming has made huge in-roads into mainstream
+software development practice. Concomittantly, ideas from FP like immutability
+have found their way into traditional enterprise OOP. Reactive Programming is
+driving many of the innovations in front-end development, and CRDTs are seeing
+broader adoption. Finally, testing techniques and tools abound alongside
+academic innovations in theorem proving, property-based testing, concolic
+testing, and other analysis techniques.
+
+The salient point in all of these examples is an emphasis on correctness,
+specifically on building confidence in the software we are shipping; a
+confidence that is pre-requisite to the enterprise agility promised by
+continuous delivery.
+
+What we desire is cloud native architecture that acts in concert with these
+innovations, lifting these ideas into the systems architecture, to enable
+agility while helping to ensure correctness. Valuing simplicity, clarity and
+generality above all, just as in the practice of programming, we wish to resolve
+the tension between the cloud era realities like eventual consistency and
+irregular reachability with these desires.
 
 Service-level Architecture
 ==========================
@@ -216,13 +265,15 @@ System-level
 Universal Backplane
 -------------------
 
-"Distributed, Replicated Messaging"
+vs ESB
 
-"What is an Event Hub?" "A high-scale, durable, distributed buffer"
-
-Domain Events
-+ Service Lifecycle Events (announce availability?)
-*Event Message* pull model: "postcard" hypermedia events
+- "Distributed, Replicated Messaging"
+- "A high-scale, durable, distributed buffer"
+- Partitioned Consumers
+- Internal Elasticity
+- Buffer -> Downsort -> Receive Queues
+- *Event Message* pull model: "postcard" hypermedia events
+- Domain Events + Service Lifecycle Events
 
 ### Provisioning
 
@@ -280,8 +331,7 @@ Appendix A: Principles of Distributed Computing
 Abridged from a [talk given by Vogles in 2009](http://www.web2expo.com/webexsf2009/public/schedule/detail/8539)
 
 Autonomy: Individual components make decisions on local information
-Asynchrony: Make progress under all circumstances
-* Back Pressure
+Asynchrony: Make progress under all circumstances (+ Back Pressure ?)
 Controlled Concurrency: operations are design such that limited or no
 concurrency control is required
 Controlled Parallelism: use fully decentralized (p2p) techniques to remove
