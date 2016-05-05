@@ -32,7 +32,9 @@ characteristic constraints of this style are as follows.
 These constraints are combined with others selected from Domain-Driven Design,
 Vogel's Principles of Distributed Computing, Enterprise Integration Patterns,
 message-oriented programming, Representational State Transfer, event sourcing,
-and stream processing.
+and stream processing. We seek to unify concepts from complementary
+sub-disciplines to create an architectural nomenclature whose information content
+is very high and unambiguous.
 
 The style is described at two levels: the System-level and the Service-level.
 The System-level describes the style as an enterprise architecture, whereas the
@@ -66,9 +68,10 @@ Foster Serendipity
 
 This verbiage is borrowed from a Steve Vinoski talk about REST. Eric Evan's
 calls it supple architecture. The idea is that our software architectures should
-foster an environment where new requirements are simple and easy to satisfy. At
-the enterprise level, such properties included discoverability and uniformity,
-while the application or service level requires composability and specificity.
+foster an environment where new requirements are easy to satisfy in a simple
+way. At the enterprise level, such properties included discoverability and
+uniformity, while the application or service level requires composability and
+specificity.
 
 Consider services like IFTTT or Zapier that enable non-trivial workflows to be
 built from simple webhook technologies. Our enterprise architectures should be
@@ -93,9 +96,9 @@ software vendors. To a large extent, this option isn't available in the cloud;
 even so, it would obviate the benefits of running in the cloud.
 
 Instead we should seek to leverage the cloud offerings to satisfy our enterprise
-requirements while freeing us from the tyranny of the enterprise hardware and
-software vendors. To do so we need an enteprise architecture that can be served
-using PaaS offerings that are more or less homogenous across clouds.
+requirements, while enabling so-called cloud agility (ability to move between
+clouds and/or on-prem). To do so we need an enteprise architecture that can be
+served using PaaS offerings that are more or less homogenous across clouds.
 
 Finally, the very nature of the cloud implies an architectural focus on
 scalability and a non-differentiation of service nodes. This is a fundamentally
@@ -116,7 +119,8 @@ testing, and other analysis techniques.
 The salient point in all of these examples is an emphasis on correctness,
 specifically on building confidence in the software we are shipping; a
 confidence that is pre-requisite to the enterprise agility promised by
-continuous delivery.
+continuous delivery. In particular state and time are hard; we want to make them
+easy by simplifying and rigorously controlling how they are handled.
 
 What we desire is cloud native architecture that acts in concert with these
 innovations, lifting these ideas into the systems architecture, to enable
@@ -127,8 +131,21 @@ irregular reachability with these desires. Failure is normal in the cloud and
 our architecture for inter-service dependencies should obviate that concern for
 individual services.
 
+Perhaps the most critical aspect of correctness is simplicity. To that end our
+architectural aim is to define simple components that can be combined in simple
+ways to create solutions easily.
+
 Service-level Architecture
 ==========================
+
+The primary building block of the Hyperobjects style are Hyperobjects
+themselves. These are autonomous services that own a well-defined area of
+knowledge in our enterprise. They are connected by a universal backplane
+(described in System-level Architecture) and are aggregated and/or proxied by
+Application Gateways (View Model servers, Frontend Servers) as necessary.
+
+To understand the Service-level architecture, we need to establish some
+terminology.
 
 Hyperobject Concepts
 --------------------
@@ -148,9 +165,13 @@ Or,
 
 ### Intents
 
-Clients get work done by sending (`POST`) Messages to Services called Intents.
-These Intents are part of the Uniform Interface in that they define a standard
-envelope format:
+Clients get work done by sending Command Messages to Services. These are called Intents
+to reflect both their provisionality (versus Command) and their role in the
+service design (capturing the intention of the user or system-actor).
+
+Intents are part of the Uniform Interface in that they define a standard
+envelope format for all Command Messages sent to the REST interface of services;
+to wit:
 
 - Activity Name: nominates the semantics for the Data property
 - Id: correlation identifier (see EIP) returned in the Resource Representation,
@@ -169,24 +190,31 @@ POST /consumer-shopping-cart/42924579adkfajl32792i98f98
 }
 ```
 
+(TODO: footnote on intents as a tool for knowledge crunching and discovery)
+
 ### Events
 
 - A Value that serves as the record that a particular business activity has transpired
 - Not always in one-to-one correspondence to an Intent, but can usually be
   viewed semantically as the "past tense" of an Intent.
-- Mostly inconsequential to clients since the projected state is always returned
 
-The request processing pipeline of a Hyperobject looks like this:
+To understand the relationship between Intents, Events, and the HTTP
+request/response, it's easiest to look at the request processing pipeline of a
+Hyperobject.
 
 ```
 Parse     :: HTTP Request -> Intent?
 Conjugate :: Intent -> State -> Event?
 Apply     :: Event  -> State -> State'?
-Store     :: Event  -> void
+Store     :: Event  -> void?
 Project   :: State' -> HTTP Response
 ```
-Outputs in question, e.g. `Intent?`, indicate a possible point of early exit from
-the pipeline should the stage fail (i.e. malformed requests).
+
+Note that outputs in question, e.g. `Intent?`, indicate a possible point of early
+exit from the pipeline should the stage fail (i.e. malformed requests). A
+further caveat: this presentation of the Hyperobject pipeline is a slightly
+simplified version of how POST is handled within an Aggregate.
+
 
 #### Note on Durability
 
@@ -196,7 +224,6 @@ select entire history atomically and consistently when spinning up Aggregate
 Root.
 
 Intents should be logged separately along with the Revision URL that resulted, if applicable.
-
 
 RESTful Domain-Driven Design
 ----------------------------
@@ -264,11 +291,22 @@ Event-Time (versus Processing Time) for every Entity within the Aggregate Root.
 
 (In Hyperobjects, there is no global time, and processing time--aka wall-clock
 time--is only interesting insofar as it is leveraged by Stream Processors (TODO
-define) to create posets and windows.)
+define) to create posets and windows. see Stream Processing 101 article)
 
 Thus, every 200-level (successful) response contains a Representation of a
 particular *Revision* of an Aggregate Root. Both that revision and the Event
 that engendered the it can be identified by the Event-Time.
+
+Putting it All Together
+-----------------------
+
+### Typical Request Process Illustrated
+
+### Interactive Documentation
+
+### Application Gateways
+
+TODO Netflix and AWS references 
 
 System-level
 ============
@@ -344,11 +382,11 @@ transactional locking is used to ensure consistency.
 ### Legacy Services and/or Monolithic Systems
 
 Similar to the advice given above for a greenfield monolith, you can introduce
-events into your monolith. First, write the events to the same store in a single transaction with
-the local update they signify. Then have a daemon process that replicates those
-events to the universal backplane. Care must be taken to preserve event
-semantics and not introduce asynchronous RPC. Factoring out concerns that are
-not domain-specific (e.g. email) is a great place to start.
+events into your monolith. First, write the events to the same store in a single
+transaction with the local update they signify. Then have a daemon process that
+replicates those events to the universal backplane. Care must be taken to
+preserve event semantics and not introduce asynchronous RPC. Factoring out
+concerns that are not domain-specific (e.g. email) is a great place to start.
 
 Appendix A: Principles of Distributed Computing
 ===============================================
