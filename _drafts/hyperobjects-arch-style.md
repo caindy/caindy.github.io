@@ -135,7 +135,8 @@ Hyperobject Concepts
 
 ### Activity Name
 
-A URN denoting either an Intent (imperative) or an Event (past-participle), e.g.:
+URNs of the form `urn:tenant:bounded-context:entity:verb`, denoting either an
+Intent (imperative) or an Event (past-participle), e.g.:
 
 - Intent URN: `urn:com:contoso:consumer-shopping:cart:checkout`
 - Event URN:  `urn:com:contoso:consumer-shopping:cart:checkout-succeeded`
@@ -246,9 +247,11 @@ constituent API surfaces.
 
 Event-Time
 ----------
-Every write operation (processed Intent) on an Aggregate Root is linearized
-(TODO why? time-ordering requires a single arbiter of order). As outlined above
-there are two effects in the processing environment:
+
+Every write operation (processed Intent) on an Aggregate Root is linearized,
+since time-ordering requires a single arbiter of order (TODO footnote about
+relativity). As outlined above there are two effects in the processing
+environment:
 
 * Encapsulated: the resultant Event is stored in a private (geoplexed) Event Log
   (eventually replicated into Event Stream)
@@ -256,16 +259,16 @@ there are two effects in the processing environment:
 
 Both of these effects are associated with a new identifer: the Revision URL.
 Recall the Revision URL has an positive integer as its final component; this
-number acts as an independent logical clock for each Aggregate Root, defining Event-Time
-(versus Processing Time) for every Entity within the Aggregate Root.
+number acts as an independent logical clock for each Aggregate Root, defining
+Event-Time (versus Processing Time) for every Entity within the Aggregate Root.
 
-(In Hyperobjects, there is no
-global time, and processing time--aka wall-clock time--is only interesting
-insofar as it is leveraged by Stream Processors (TODO define) to create posets and windows.)
+(In Hyperobjects, there is no global time, and processing time--aka wall-clock
+time--is only interesting insofar as it is leveraged by Stream Processors (TODO
+define) to create posets and windows.)
 
 Thus, every 200-level (successful) response contains a Representation of a
-particular *Revision* of an Aggregate Root. Both that revision and the Event that engendered the
-it can be identified by the Event-Time. 
+particular *Revision* of an Aggregate Root. Both that revision and the Event
+that engendered the it can be identified by the Event-Time.
 
 System-level
 ============
@@ -273,7 +276,7 @@ System-level
 Universal Backplane
 -------------------
 
-vs ESB
+As distinct from an Enterprise Service Bus:
 
 - "Distributed, Replicated Messaging"
 - "A high-scale, durable, distributed buffer"
@@ -290,7 +293,8 @@ vs ESB
 Hyperobject metadata interface lists the Topic/event-URNs and/or patterns it is
 interested in as well as the event-URNs it is interested in (subscriptions).
 When the Hyperobject joins the Service Network, this information is used to
-setup Subscriptions. Subscriptions can be patterns, e.g. `urn:tenant:bounded-context:aggregate:*`
+setup Subscriptions. Subscriptions can be patterns, e.g.
+`urn:tenant:bounded-context:aggregate:*`
 
 ### Ingress
 
@@ -316,6 +320,8 @@ setup Subscriptions. Subscriptions can be patterns, e.g. `urn:tenant:bounded-con
 A Hyperobject's subscription to itself, used to update QUERY nodes.
 - Bypass Content Filter
 - Makes progress even while Circuit Breaker is tripped
+- Logical: potentially implemented by e.g. gossip protocol; the salient feature
+  is that it is downstream from the event log
 
 Discussion
 ==========
