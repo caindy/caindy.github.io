@@ -118,21 +118,21 @@ testing, and other analysis techniques.
 
 The salient point in all of these examples is an emphasis on correctness,
 specifically on building confidence in the software we are shipping; a
-confidence that is prerequisite to the enterprise agility promised by
-continuous delivery. In particular state and time are hard; we want to make them
-easy by simplifying and rigorously controlling how they are handled.
+confidence that is prerequisite to the enterprise agility promised by continuous
+delivery. In particular, state and time are hard; we want to make them easy by
+simplifying and rigorously controlling how they are handled.
 
-What we desire is cloud native architecture that acts in concert with these
+What we desire is a cloud native architecture that acts in concert with these
 innovations, lifting these ideas into the systems architecture, to enable
-agility while helping to ensure correctness. Valuing simplicity, clarity and
-generality above all, just as in the practice of programming, we wish to resolve
-the tension between the cloud era realities like eventual consistency and
-irregular reachability with these desires. Failure is normal in the cloud and
-our architecture for inter-service dependencies should obviate that concern for
-individual services.
+agility while helping to ensure correctness, though we are forced to accept a
+relaxed definition of correctness as distributed systems establish a reality of
+eventual consistency and regular failure. Valuing simplicity, clarity and
+generality above all, we wish to resolve the tension between these cloud era
+realities and our existing tools by obviating these concerns for individual
+services.
 
-Perhaps the most critical aspect of correctness is simplicity. To that end our
-architectural aim is to define simple components that can be combined in simple
+The most critical aspect of correctness is simplicity. To that end our
+architectural aim is to define simple components that can be composed in simple
 ways to create solutions easily.
 
 Service-level Architecture
@@ -142,7 +142,7 @@ The primary building block of the Hyperobjects style are Hyperobjects
 themselves. These are autonomous services that own a well-defined area of
 knowledge in our enterprise. They are connected by a universal backplane
 (described in System-level Architecture) and are aggregated and/or proxied by
-Application Gateways (View Model servers, Frontend Servers) as necessary.
+Application Gateways (aka View Model servers, Frontend Servers) as necessary.
 
 To understand the Service-level architecture, we need to establish some
 terminology.
@@ -277,21 +277,21 @@ Event-Time
 
 Every write operation (processed Intent) on an Aggregate Root is linearized,
 since time-ordering requires a single arbiter of order (TODO footnote about
-relativity). As outlined above there are two effects in the processing
-environment:
+relativity, also single-node ownership of in-memory data store). As outlined
+above there are two effects in the processing environment:
 
 * Encapsulated: the resultant Event is stored in a private (geoplexed) Event Log
   (eventually replicated into Event Stream)
 * Observable: the HTTP response containing a Representation of the new projected state
 
-Both of these effects are associated with a new identifer: the Revision URL.
+Both of these effects are associated with a new identifier: the Revision URL.
 Recall the Revision URL has an positive integer as its final component; this
 number acts as an independent logical clock for each Aggregate Root, defining
 Event-Time (versus Processing Time) for every Entity within the Aggregate Root.
 
 (In Hyperobjects, there is no global time, and processing time--aka wall-clock
 time--is only interesting insofar as it is leveraged by Stream Processors (TODO
-define) to create posets and windows. see Stream Processing 101 article)
+define) to create Posets and windows. see Stream Processing 101 article)
 
 Thus, every 200-level (successful) response contains a Representation of a
 particular *Revision* of an Aggregate Root. Both that revision and the Event
@@ -371,6 +371,8 @@ Common Concerns
 
 Individual services re-inventing the wheel: "Speed of execution" justifies (Vogels)
 
+"Premature abstraction is more expensive than nominal repetition"
+
 ### Premature Complexity
 
 Monolith can be designed for service-orientation from the beginning. In a
@@ -391,20 +393,18 @@ concerns that are not domain-specific (e.g. email) is a great place to start.
 Appendix A: Principles of Distributed Computing
 ===============================================
 
-Abridged from a [talk given by Vogles in 2009](http://www.web2expo.com/webexsf2009/public/schedule/detail/8539)
+Abridged from a [talk given by Vogels in 2009](http://www.web2expo.com/webexsf2009/public/schedule/detail/8539)
 
-Autonomy: Individual components make decisions on local information
-Asynchrony: Make progress under all circumstances (+ Back Pressure ?)
-Controlled Concurrency: operations are design such that limited or no
-concurrency control is required
-Controlled Parallelism: use fully decentralized (p2p) techniques to remove
-bottlenecks
-Decentralize: remove dependencies
-Decompose:
-Failure Tolerant: failure normal
-Local Responsibility for Consistency
-Simplicity: as simple as possible but no simpler
-Symmetry: all nodes can do any function
+Autonomy: Individual components make decisions on local information  
+Asynchrony: Make progress under all circumstances (+ Back Pressure ?)  
+Controlled Concurrency: operations are design such that limited or no concurrency control is required  
+Controlled Parallelism: use fully decentralized (p2p) techniques to remove bottlenecks  
+Decentralize: remove dependencies  
+Decompose:  
+Failure Tolerant: failure normal  
+Local Responsibility for Consistency  
+Simplicity: as simple as possible but no simpler  
+Symmetry: all nodes can do any function  
 
 
 Appendix B: Hyperobject Service Implementation Details
@@ -500,8 +500,8 @@ applied to the current `State` which is then returned as a `Representation`
 necessary, `410 Gone` if Aggregate Root has been `archived`, and `401 Unauthorized`
 in cases where a security credential is required but not present
 - __conjugate__&ast;: `Intent -> Event` Conjugate is a term borrowed from
-grammar and chemistry. In studying foreign languages, we will often learn to
-conjugate verbs from the present tense to e.g. the past tense. This is exactly
+grammar and chemistry. In studying most foreign languages, we will learn to
+conjugate verbs from the present tense to the past tense. This is exactly
 the meaning here in converting an `Intent` to an `Event`. In chemistry the term
 hews to the Latin morphology of "yoked together"; there it means "to be combined
 with or joined reversibly". *Certain properties of Intents (trackingId?
