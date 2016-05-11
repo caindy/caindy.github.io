@@ -50,3 +50,6 @@ coverage
 .ruby-version
 .sass-cache
 _site/
+
+#mirage stuff
+_mirage/
