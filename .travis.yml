@@ -1,6 +1,9 @@
 language: c
 sudo: required
-install: wget https://raw.githubusercontent.com/ocaml/ocaml-ci-scripts/master/.travis-mirage.sh
+before_install:
+   - rvm install 2.2.1
+install: gem install jekyll -v 3.1.3 && wget https://raw.githubusercontent.com/ocaml/ocaml-ci-scripts/master/.travis-mirage.sh
+before_script: jekyll build && cd _mirage
 script: bash -ex .travis-mirage.sh
 env:
   - OCAML_VERSION=4.03 MIRAGE_BACKEND=xen MIRAGE_NET=socket DEPLOY=0 FORK_USER=caindy
