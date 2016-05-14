@@ -1,9 +1,7 @@
 language: c
 sudo: required
-python:
-  - "2.7"
 before_install:
-  - rvm install 2.2.1
+  - rvm install 2.3
   - sudo apt-get -qq update
   - sudo apt-get -y install python-pip
 install:
@@ -15,7 +13,7 @@ before_script:
   - cd _mirage
 script:
   - bash -ex ../.travis-mirage.sh
-  - aws run-instances --user-data
+  - aws ec2 run-instances --user-data file://ec2.sh --instance-type t2.nano --dry-run
 env:
   - OCAML_VERSION=4.03 MIRAGE_BACKEND=xen DEPLOY=0 FORK_USER=caindy UPDATE_GCC_BINUTILS=1
 os:
