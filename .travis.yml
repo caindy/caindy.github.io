@@ -2,6 +2,10 @@ language: c
 sudo: required
 python:
   - "3.4"
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
 before_install:
   - rvm install 2.2.1
   - sudo apt-get -qq update
@@ -17,7 +21,7 @@ before_script:
   - cd _mirage
 script:
   - bash -ex ../.travis-mirage.sh
-  - aws run-instances
+  - aws run-instances --user-data
 env:
   - OCAML_VERSION=4.03 MIRAGE_BACKEND=xen DEPLOY=0 FORK_USER=caindy UPDATE_GCC_BINUTILS=1
 os:
