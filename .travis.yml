@@ -1,12 +1,21 @@
 language: c
 sudo: required
+python:
+  - "3.4"
 before_install:
-   - rvm install 2.2.1
-install: gem install github-pages && wget https://raw.githubusercontent.com/ocaml/ocaml-ci-scripts/master/.travis-mirage.sh
-before_script: jekyll build && cd _mirage
+  - rvm install 2.2.1
+  - sudo apt-get -y install python3-pip python-dev
+  - sudo pip3 install -U setuptools
+  - sudo pip3 install -U virtualenvwrapper
+install:
+  - gem install github-pages
+  - wget https://raw.githubusercontent.com/caindy/ocaml-ci-scripts/master/.travis-mirage.sh
+  - pip install awscli
+before_script:
+  - jekyll build
+  - cd _mirage
 script: bash -ex ../.travis-mirage.sh
 env:
-  - OCAML_VERSION=4.03 MIRAGE_BACKEND=unix MIRAGE_NET=socket DEPLOY=0 FORK_USER=caindy
   - OCAML_VERSION=4.03 MIRAGE_BACKEND=xen DEPLOY=0 FORK_USER=caindy UPDATE_GCC_BINUTILS=1
 os:
   - linux
