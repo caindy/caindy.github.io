@@ -9,7 +9,7 @@ before_install:
 install:
   - gem install github-pages
   - wget https://raw.githubusercontent.com/caindy/ocaml-ci-scripts/master/.travis-mirage.sh
-  - pip install awscli
+  - pip install --user awscli
 before_script:
   - jekyll build
   - cd _mirage
