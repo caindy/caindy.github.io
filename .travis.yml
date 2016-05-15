@@ -13,7 +13,7 @@ before_script:
   - cd _mirage
 script:
   - bash -ex ../.travis-mirage.sh
-  - S3FILENAME=`date '+%Y-%m-%d-%H-%M-%s.xen'`; aws s3 cp file://mir-www.xen "s3://mirage-blog/${FILENAME}"
+  - S3FILENAME=`date '+%Y-%m-%d-%H-%M-%s.xen'`; aws s3 cp mir-www.xen "s3://mirage-blog/${FILENAME}"
   - aws ec2 run-instances --user-data file://ec2.sh --instance-type t2.nano --dry-run
 env:
   - OCAML_VERSION=4.03 MIRAGE_BACKEND=xen DEPLOY=0 FORK_USER=caindy UPDATE_GCC_BINUTILS=1
