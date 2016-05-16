@@ -18,4 +18,4 @@ cat ec2.sh >> ec2deploy.sh
 
 #run builder instance
 AMZN_LINUX=ami-f5f41398
-aws ec2 run-instances --user-data file://ec2deploy.sh --instance-type t2.nano --image-id ${AMZN_LINUX} --region us-east-1 --instance-initiated-shutdown-behavior terminate --security-groups blog-builder-sg --key-name mirage-blog-image-builder-keys --iam-instance-profile mirage-blog-image-builder
+aws ec2 run-instances --user-data file://ec2deploy.sh --instance-type t2.nano --image-id ${AMZN_LINUX} --region us-east-1 --instance-initiated-shutdown-behavior terminate --security-groups blog-builder-sg --key-name mirage-blog-image-builder-keys --iam-instance-profile Name=mirage-blog-image-builder
