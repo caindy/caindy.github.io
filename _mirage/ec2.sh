@@ -22,7 +22,7 @@ set -e
 KERNEL=aki-919dcaf8 #us-east-1
 
 echo fetch unikernel
-aws s3 cp ${UNIKERNEL_S3_URI} $APP
+aws s3 cp ${UNIKERNEL_S3_URI} ${APP}
 
 echo create loop device
 ${SUDO} mkdir -p ${MNT}
@@ -39,7 +39,7 @@ echo title Mirage >> menu.lst
 echo " root (hd0)" >> menu.lst
 echo " kernel /boot/mirage-os.gz" >> menu.lst
 ${SUDO} mv menu.lst ${MNT}/boot/grub/menu.lst
-${SUDO} sh   -c "gzip -c $APP > ${MNT}/boot/mirage-os.gz"
+${SUDO} sh   -c "gzip -c ${APP} > ${MNT}/boot/mirage-os.gz"
 ${SUDO} umount -d ${MNT}
 
 rm -rf ec2_tmp
