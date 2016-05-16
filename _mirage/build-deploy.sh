@@ -12,4 +12,4 @@ echo "AWS_USER_ID=${AWS_USER_ID}" >> ec2deploy.sh
 echo "NAME=mirage-blog-${NEWNAME}" >> ec2deploy.sh
 cat ec2.sh >> ec2deploy.sh
 AMZN_LINUX=ami-f5f41398
-aws ec2 run-instances --user-data file://ec2deploy.sh --instance-type t2.nano --image-id ${AMZN_LINUX} --region us-east-1 --instance-initiated-shutdown-behavior terminate --dry-run
+aws ec2 run-instances --user-data file://ec2deploy.sh --instance-type t2.nano --image-id ${AMZN_LINUX} --region us-east-1 --instance-initiated-shutdown-behavior terminate --security-groups blog-builder-sg --dry-run
