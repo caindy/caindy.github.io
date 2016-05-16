@@ -1,4 +1,7 @@
 
+# instance is started with implicit termination
+trap 'shutdown -P now' 0
+
 # Build an EC2 bundle and upload/register it to Amazon.
 BUCKET=mirage-blog
 REGION=us-east-1
@@ -43,15 +46,11 @@ echo Uploading image...
 ec2-upload-bundle -b ${BUCKET} -m ec2_tmp/${IMG}.manifest.xml --location US
 
 echo Registering image...
+oldid=`aws ec2 describe-images --owners self --filters Name=name,Values=mirage-blog* | grep ImageId | sed 's/.*ami-\(.*\)",/ami-\1/'`
+aws ec2 deregister-image --image-id $id
 id=`aws ec2 register-image ${BUCKET}/${IMG}.manifest.xml -n ${NAME} --region ${REGION} | awk '{print $2}'`
-rm -rf ec2_tmp
-rm -f ${IMG}
 
-echo You can now start this instance via:
-echo ec2-run-instances --region ${REGION} $id
-echo ""
-echo Don\'t forget to customise this with a security group, as the
-echo default one won\'t let any inbound traffic in.
+aws ec2 run-instances --instance-type t2.nano --image-id $id --region us-east-1 --instance-initiated-shutdown-behavior terminate --dry-run
 
 # CNAME swap -- should wait for boot, but it's so fast... confirm port 80
-# shutdown now
+#shutdown -P now
