@@ -1,4 +1,7 @@
 
+# capture all output in three places
+exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
+
 # instance is started with implicit termination
 # trap 'shutdown -P now' 0
 
@@ -18,12 +21,17 @@ set -e
 # Also obtained from http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/UserProvidedKernels.html
 KERNEL=aki-919dcaf8 #us-east-1
 
+echo fetch unikernel
+aws s3 cp ${UNIKERNEL_S3_URI} $APP
+
+echo create loop device
 ${SUDO} mkdir -p ${MNT}
 rm -f ${IMG}
 dd if=/dev/zero of=${IMG} bs=1M count=5
 ${SUDO} mke2fs -F -j ${IMG}
 ${SUDO} mount -o loop ${IMG} ${MNT}
 
+echo preparing image
 ${SUDO} mkdir -p ${MNT}/boot/grub
 echo default 0 > menu.lst
 echo timeout 1 >> menu.lst
@@ -55,4 +63,4 @@ id=`aws ec2 register-image ${BUCKET}/${IMG}.manifest.xml -n ${NAME} --region ${R
 aws ec2 run-instances --instance-type t2.nano --image-id $id --region us-east-1 --instance-initiated-shutdown-behavior terminate --dry-run
 
 # CNAME swap -- should wait for boot, but it's so fast... confirm port 80
-#shutdown -P now
+# ${SUDO} shutdown -P now
