@@ -50,7 +50,7 @@ oldid=`aws ec2 describe-images --owners self --filters Name=name,Values=mirage-b
 aws ec2 deregister-image --image-id $id
 id=`aws ec2 register-image ${BUCKET}/${IMG}.manifest.xml -n ${NAME} --region ${REGION} | awk '{print $2}'`
 
-aws ec2 run-instances --instance-type t2.nano --image-id $id --region us-east-1 --instance-initiated-shutdown-behavior terminate
+aws ec2 run-instances --instance-type t2.nano --image-id $id --region us-east-1 --instance-initiated-shutdown-behavior terminate --dry-run
 
 # CNAME swap -- should wait for boot, but it's so fast... confirm port 80
 #shutdown -P now
