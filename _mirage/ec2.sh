@@ -47,7 +47,9 @@ ec2-upload-bundle -b ${BUCKET} -m ec2_tmp/${IMG}.manifest.xml --location US
 
 echo Registering image...
 oldid=`aws ec2 describe-images --owners self --filters Name=name,Values=mirage-blog* | grep ImageId | sed 's/.*ami-\(.*\)",/ami-\1/'`
-aws ec2 deregister-image --image-id $id
+if [-n $oldid]; then
+  aws ec2 deregister-image --image-id $id
+fi
 id=`aws ec2 register-image ${BUCKET}/${IMG}.manifest.xml -n ${NAME} --region ${REGION} | awk '{print $2}'`
 
 aws ec2 run-instances --instance-type t2.nano --image-id $id --region us-east-1 --instance-initiated-shutdown-behavior terminate --dry-run
