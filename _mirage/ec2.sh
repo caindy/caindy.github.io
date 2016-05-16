@@ -44,14 +44,15 @@ ${SUDO} umount -d ${MNT}
 
 rm -rf ec2_tmp
 mkdir ec2_tmp
+
 echo Bundling image...
 IMG_BUNDLE_KEY=img-bundling-key.pem
 openssl genrsa 2048 > ${IMG_BUNDLE_KEY} #we will never unbundle, so just make it up
 aws s3 cp s3://mirage-blog/bundle-signing-cert.pem cert.pem
-ec2-bundle-image -i ${IMG} -k ${IMG_BUNDLE_KEY} -c cert.pem -u ${AWS_USER_ID} -d ec2_tmp -r x86_64 --kernel ${KERNEL}
+/opt/aws/bin/ec2-bundle-image -i ${IMG} -k ${IMG_BUNDLE_KEY} -c cert.pem -u ${AWS_USER_ID} -d ec2_tmp -r x86_64 --kernel ${KERNEL}
 
 echo Uploading image...
-ec2-upload-bundle -b ${BUCKET} -m ec2_tmp/${IMG}.manifest.xml --location US
+/opt/aws/bin/ec2-upload-bundle -b ${BUCKET} -m ec2_tmp/${IMG}.manifest.xml --location US
 
 echo Registering image...
 oldid=`aws ec2 describe-images --owners self --filters Name=name,Values=mirage-blog* | grep ImageId | sed 's/.*ami-\(.*\)",/ami-\1/'`
