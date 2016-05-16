@@ -57,7 +57,7 @@ echo Uploading image...
 echo Registering image...
 oldid=`aws ec2 describe-images --owners self --filters Name=name,Values=mirage-blog* | grep ImageId | sed 's/.*ami-\(.*\)",/ami-\1/'`
 if [-n $oldid]; then
-  aws ec2 deregister-image --image-id $id
+  aws ec2 deregister-image --image-id $id --region ${REGION}
 fi
 id=`aws ec2 register-image ${BUCKET}/${IMG}.manifest.xml -n ${NAME} --region ${REGION} | awk '{print $2}'`
 
