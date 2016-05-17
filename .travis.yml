@@ -14,5 +14,8 @@ before_script:
 script: build-deploy.sh
 env:
   - OCAML_VERSION=4.03 MIRAGE_BACKEND=xen DEPLOY=0 FORK_USER=caindy UPDATE_GCC_BINUTILS=1
+    PINS="mirage-bootvar-xen:'https://github.com/talex5/mirage-bootvar-xen.git#qubes'"
+
+
 os:
   - linux
