@@ -1,24 +1,28 @@
 
+REGION=us-east-1
+aws configure set default.region $REGION
+
 # capture all output in three places
 exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
 
 cleanup() {
 	  echo $1
-	  [ -e ${EBS_DEVICE} ] && [ -n "${VOL}" ] && [ -n "${REGION}" ] && {
-		    aws ec2 detach-volume --volume-id $VOL --region $REGION
-		    aws ec2 delete-volume --volume-id $VOL --region $REGION
+    local code="${3:-1}"
+	  [ -e ${EBS_DEVICE} ] && [ -n "${VOL}" ] {
+		    aws ec2 detach-volume --volume-id $VOL
+		    aws ec2 delete-volume --volume-id $VOL
 	  }
+    [ $code -ne 0 ] && exit $code
     # instance is started with implicit termination
     # shutdown -P now
-    [ ERR -ne 0 ] && exit ERR
-	  exit 1
+    exit 0 #while debugging
 }
 
 trap 'cleanup "unexpected error"' ERR
+trap 'cleanup "completed normally"' EXIT
 
 # Build an EC2 bundle and upload/register it to Amazon.
 BUCKET=mirage-blog
-REGION=us-east-1
 
 # Make name unique to avoid registration clashes
 # and sortable so we can rollback if necessary
@@ -40,15 +44,27 @@ echo fetch unikernel
 aws s3 cp ${UNIKERNEL_S3_URI} ${APP}
 
 echo makng an EBS volume of smallest size to hold unikernel boot image
-ZONE=`aws ec2 describe-instances --instance-id $BUILDER --region ${REGION} | grep AvailabilityZone | sed "s/.*\(${REGION}\w\)\".*/\1/"`
-VOL=`aws ec2 create-volume --size 1 --region ${REGION} --availability-zone ${ZONE} | grep VolumeId | sed 's/.*\(vol-.*\)".*/\1/'`
-if [ "$VOL" = "" ]; then
+ZONE=`aws ec2 describe-instances --instance-id $BUILDER | grep AvailabilityZone | sed "s/.*\(${REGION}\w\)\".*/\1/"`
+VOL=`aws ec2 create-volume --size 1 --availability-zone ${ZONE} | grep VolumeId | sed 's/.*\(vol-.*\)".*/\1/'`
+if [ -z "$VOL" ]; then
 	  cleanup "Failed to create an EBS volume."
 fi
 
-echo attaching volume to builder instance
 EBS_DEVICE='/dev/xvdh'
-aws ec2 attach-volume --volume-id $VOL --instance-id $BUILDER --device $EBS_DEVICE --region $REGION
+
+VOL_RETRY=0
+while true; do
+    echo "waiting for volume to become available, attempt $[$VOL_RETRY + 1]"
+    [ $VOL_RETRY -lt 5 ] || cleanup "volume never became available"
+    sleep 5
+    VOL_STATE=`aws ec2 describe-volumes --volume-id $VOL | grep State | sed "s/^[ \t]*\"State\": \"\(.*\)\".*/\1/"`
+    [ "$VOL_STATE" = "available" ] && break
+    echo "volume $VOL not yet available, current status: $VOL_STATE"
+    VOL_RETRY=$[$VOL_RETRY + 1]
+done
+
+echo attaching volume to builder instance
+aws ec2 attach-volume --volume-id $VOL --instance-id $BUILDER --device $EBS_DEVICE
 [ $? -ne 0 ] && {
 	  cleanup "Couldn't attach the EBS volume to this instance."
 }
@@ -74,27 +90,24 @@ ${SUDO} sh -c "gzip -c ${APP} > ${MNT}/boot/mirage-os.gz"
 ${SUDO} umount -d ${MNT}
 
 echo creating EBS volume snapshot
-SNAPSHOT_ID=`aws ec2 create-snapshot --region $REGION --volume-id $VOL | grep SnapshotId | sed 's/.*\(snap-.*\)".*/\1/'`
+SNAPSHOT_ID=`aws ec2 create-snapshot --volume-id $VOL | grep SnapshotId | sed 's/.*\(snap-.*\)".*/\1/'`
 [ -z "{$SNAPSHOT_ID}" ] && cleanup "Couldn't make a snapshot of the EBS volume."
 
-OLDID=`aws ec2 describe-images --owners self --region ${REGION} --filters Name=name,Values=mirage-blog | grep ImageId | sed 's/.*ami-\(.*\)",/ami-\1/'`
+OLDID=`aws ec2 describe-images --owners self --filters Name=name,Values=mirage-blog | grep ImageId | sed 's/.*ami-\(.*\)",/ami-\1/'`
 if [ -n "${OLDID}" ]; then
     echo "Unregistering image id $OLDID"
-    aws ec2 deregister-image --image-id $OLDID --region ${REGION} || echo "image $oldid already deregistered"
+    aws ec2 deregister-image --image-id $OLDID || echo "image $oldid already deregistered"
 fi
 
 echo "Registering image..."
-NEWID=`aws ec2 register-image --name mirage-blog --region ${REGION} --kernel $KERNEL --snapshot-id $SNAPSHOT_ID --architecture x86_64" | awk '{print $2}' | sed 's/"\(.*\)"/\1/'`
-
+NEWID=`aws ec2 register-image --name mirage-blog --kernel $KERNEL --architecture x86_64 --block-device-mappings '[{"DeviceName":"/dev/sda1","Ebs":{"SnapshotId":"'"${SNAPSHOT_ID}"'","VolumeSize":8}}]' --root-device-name '/dev/sda1' | awk '{print $2}' | sed 's/"\(.*\)"/\1/'`
 [ -z "${NEWID}" ] && {
 	  echo "Retrying snapshot..."
 	  sleep 5
-    NEWID=`aws ec2 register-image --name mirage-blog --region ${REGION} --kernel $KERNEL --snapshot-id $SNAPSHOT_ID --architecture x86_64" | awk '{print $2}' | sed 's/"\(.*\)"/\1/'`
+    NEWID=`aws ec2 register-image --name mirage-blog --kernel $KERNEL --architecture x86_64 --block-device-mappings '[{"DeviceName":"/dev/sda1","Ebs":{"SnapshotId":"'"${SNAPSHOT_ID}"'","VolumeSize":8}}]' --root-device-name '/dev/sda1' | awk '{print $2}' | sed 's/"\(.*\)"/\1/'`
 }
 
 echo "Running instance"
-aws ec2 run-instances --instance-type t2.nano --image-id $id --region ${REGION} --instance-initiated-shutdown-behavior terminate --dry-run
+aws ec2 run-instances --instance-type t2.micro --image-id $NEWID --instance-initiated-shutdown-behavior terminate --dry-run
 
-cleanup "Instance started successfully"
 # CNAME swap -- should wait for boot, but it's so fast... confirm port 80
-# ${SUDO} shutdown -P now
