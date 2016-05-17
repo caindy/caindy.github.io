@@ -12,10 +12,10 @@ cleanup() {
 		    aws ec2 detach-volume --volume-id $VOL
 		    aws ec2 delete-volume --volume-id $VOL
 	  }
-    [[ $code -ne 0 ]] && exit $code
+    #[[ $code -ne 0 ]] && exit $code
     # instance is started with implicit termination
-    # shutdown -P now
-    exit 0 #while debugging
+    shutdown -P now
+    #exit 0 #while debugging
 }
 
 trap 'cleanup "unexpected error"' ERR
@@ -52,7 +52,7 @@ fi
 EBS_DEVICE='/dev/xvdh'
 VOL_RETRY=0
 while true; do
-    [ $VOL_RETRY -lt 30 ] || exit -1
+    [ $VOL_RETRY -lt 30 ] || cleanup "creating volume never finished"
     echo "waiting for volume to become available, attempt $[$VOL_RETRY + 1]"
     sleep 2
     VOL_STATE=`aws ec2 describe-volumes --volume-id $VOL | grep State | sed "s/^[ \t]*\"State\": \"\(.*\)\".*/\1/"`
@@ -91,7 +91,7 @@ echo creating EBS volume snapshot
 SNAPSHOT_ID=`aws ec2 create-snapshot --volume-id $VOL | grep SnapshotId | sed 's/.*\(snap-.*\)".*/\1/'`
 SNAP_RETRY=0
 while true; do
-    [ $SNAP_RETRY -lt 30 ] || exit -1
+    [ $SNAP_RETRY -lt 60 ] || cleanup "snapshot never finished"
     echo "waiting for volume to become available, attempt $[$SNAP_RETRY + 1]"
     sleep 2
     SNAP_STATE=`aws ec2 describe-snapshots --snapshot-id ${SNAPSHOT_ID} | grep State | sed "s/^[ \t]*\"State\": \"\(.*\)\".*/\1/"`
