@@ -3,16 +3,16 @@ REGION=us-east-1
 aws configure set default.region $REGION
 
 # capture all output in three places
-exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
+#exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
 
 cleanup() {
+    local code=$?
 	  echo $1
-    local code="${3:-1}"
-	  [ -e ${EBS_DEVICE} ] && [ -n "${VOL}" ] {
+	  [ -e ${EBS_DEVICE} ] && [ -n "${VOL}" ] && {
 		    aws ec2 detach-volume --volume-id $VOL
 		    aws ec2 delete-volume --volume-id $VOL
 	  }
-    [ $code -ne 0 ] && exit $code
+    [[ $code -ne 0 ]] && exit $code
     # instance is started with implicit termination
     # shutdown -P now
     exit 0 #while debugging
@@ -20,6 +20,7 @@ cleanup() {
 
 trap 'cleanup "unexpected error"' ERR
 trap 'cleanup "completed normally"' EXIT
+
 
 # Build an EC2 bundle and upload/register it to Amazon.
 BUCKET=mirage-blog
