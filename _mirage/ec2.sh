@@ -119,4 +119,6 @@ NEWID=`aws ec2 register-image --name mirage-blog --kernel $KERNEL --architecture
 echo "Running instance"
 aws ec2 run-instances --instance-type t1.micro --image-id $NEWID --instance-initiated-shutdown-behavior terminate
 
+cleanup "everything worked"
+
 # CNAME swap -- should wait for boot, but it's so fast... confirm port 80
