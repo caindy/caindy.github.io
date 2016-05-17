@@ -26,7 +26,7 @@ BUCKET=mirage-blog
 
 # Make name unique to avoid registration clashes
 # and sortable so we can rollback if necessary
-MNT=/tmp/mirage-ec2
+MNT=/mnt
 SUDO=sudo
 IMG=${NAME}.img
 APP=mirage-os.xen
@@ -51,12 +51,11 @@ if [ -z "$VOL" ]; then
 fi
 
 EBS_DEVICE='/dev/xvdh'
-
 VOL_RETRY=0
 while true; do
+    [ $VOL_RETRY -lt 10 ] || exit -1
     echo "waiting for volume to become available, attempt $[$VOL_RETRY + 1]"
-    [ $VOL_RETRY -lt 5 ] || cleanup "volume never became available"
-    sleep 5
+    sleep 2
     VOL_STATE=`aws ec2 describe-volumes --volume-id $VOL | grep State | sed "s/^[ \t]*\"State\": \"\(.*\)\".*/\1/"`
     [ "$VOL_STATE" = "available" ] && break
     echo "volume $VOL not yet available, current status: $VOL_STATE"
@@ -75,7 +74,7 @@ echo waiting for block device
 [ ! -e ${EBS_DEVICE} ] && sleep 2
 
 echo mounting block device
-${SUDO} mkfs.ext2 $EBS_DEVICE
+${SUDO} mkfs.ext2 $EBS_DEVICE -F
 ${SUDO} mount -t ext2 ${EBS_DEVICE} $MNT
 
 echo preparing image
@@ -91,7 +90,17 @@ ${SUDO} umount -d ${MNT}
 
 echo creating EBS volume snapshot
 SNAPSHOT_ID=`aws ec2 create-snapshot --volume-id $VOL | grep SnapshotId | sed 's/.*\(snap-.*\)".*/\1/'`
-[ -z "{$SNAPSHOT_ID}" ] && cleanup "Couldn't make a snapshot of the EBS volume."
+SNAP_RETRY=0
+while true; do
+    [ $SNAP_RETRY -lt 10 ] || exit -1
+    echo "waiting for volume to become available, attempt $[$SNAP_RETRY + 1]"
+    sleep 2
+    SNAP_STATE=`aws ec2 describe-snapshots --snapshot-id ${SNAPSHOT_ID} | grep State | sed "s/^[ \t]*\"State\": \"\(.*\)\".*/\1/"`
+    [ "$SNAP_STATE" = "completed" ] && break
+    echo "snapshot $SNAPSHOT_ID not yet completed, current status: $SNAP_STATE"
+    SNAP_RETRY=$[$SNAP_RETRY + 1]
+done
+
 
 OLDID=`aws ec2 describe-images --owners self --filters Name=name,Values=mirage-blog | grep ImageId | sed 's/.*ami-\(.*\)",/ami-\1/'`
 if [ -n "${OLDID}" ]; then
@@ -101,6 +110,7 @@ fi
 
 echo "Registering image..."
 NEWID=`aws ec2 register-image --name mirage-blog --kernel $KERNEL --architecture x86_64 --block-device-mappings '[{"DeviceName":"/dev/sda1","Ebs":{"SnapshotId":"'"${SNAPSHOT_ID}"'","VolumeSize":8}}]' --root-device-name '/dev/sda1' | awk '{print $2}' | sed 's/"\(.*\)"/\1/'`
+# --virtualization-type hvm ???
 [ -z "${NEWID}" ] && {
 	  echo "Retrying snapshot..."
 	  sleep 5
@@ -108,6 +118,6 @@ NEWID=`aws ec2 register-image --name mirage-blog --kernel $KERNEL --architecture
 }
 
 echo "Running instance"
-aws ec2 run-instances --instance-type t2.micro --image-id $NEWID --instance-initiated-shutdown-behavior terminate --dry-run
+aws ec2 run-instances --instance-type t1.micro --image-id $NEWID --instance-initiated-shutdown-behavior terminate --dry-run
 
 # CNAME swap -- should wait for boot, but it's so fast... confirm port 80
