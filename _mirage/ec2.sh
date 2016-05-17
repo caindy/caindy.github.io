@@ -91,7 +91,7 @@ echo creating EBS volume snapshot
 SNAPSHOT_ID=`aws ec2 create-snapshot --volume-id $VOL | grep SnapshotId | sed 's/.*\(snap-.*\)".*/\1/'`
 SNAP_RETRY=0
 while true; do
-    [ $SNAP_RETRY -lt 60 ] || cleanup "snapshot never finished"
+    [ $SNAP_RETRY -lt 120 ] || cleanup "snapshot never finished"
     echo "waiting for volume to become available, attempt $[$SNAP_RETRY + 1]"
     sleep 2
     SNAP_STATE=`aws ec2 describe-snapshots --snapshot-id ${SNAPSHOT_ID} | grep State | sed "s/^[ \t]*\"State\": \"\(.*\)\".*/\1/"`
