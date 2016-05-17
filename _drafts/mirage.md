@@ -102,12 +102,21 @@ CI build that fires up an AMI builder in EC2. We'll cover the builder script in
 a bit, but I should explain here why we can't just build the AMI in Travis.
 
 We want to use a `t2.nano` instance for the blog instance itself, because it's
-so cheap (even free). Unfortunately, `t2.nano` can only run AMIs that are EBS
-backed, and you can only bundle such an AMI from within an EBS backed instance.
-(TODO: find they whys and wherefores about this restriction)
+so cheap. Unfortunately, `t2.nano` only runs HVM-based AMIs, and currently
+Mirage unikernels only support booting on
+[paravirtualization](http://lists.xenproject.org/archives/html/mirageos-devel/2015-09/msg00066.html),
+as supported by
+[PV-GRUB in AWS](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/UserProvidedKernels.html),
+which will chain load our unikernel. So, to run our unikernel in AWS we have to
+run it on an instance type that supports `paravirtual` not `hvm` images. Bummer.
 
-So, we're going to spin up a `t2.nano` running an AWS Linux AMI, because it
-already has the AWS CLI tools we need to create and register our unikernel AMI 
+The [cheapest of these](http://www.ec2instances.info/) is `t1.micro` at roughly
+*3x* the cost for effectively the same resources. Like `t2.nano`, `t1.micro` is
+EBS volume backed, meaning we need to prepare our image by create it on an EBS
+volume. So, we're going to spin up a `t2.nano` running an AWS Linux AMI to prep
+the volume, snapshot it, and register it as an AMI. We want to use AWS Linux
+because it already has the AWS CLI tools we need. Once the AMI is available we
+will run a `t1.micro` instance of it.
 
 #### Doesn't work out of the box
 

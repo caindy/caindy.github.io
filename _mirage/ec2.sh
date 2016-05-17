@@ -19,8 +19,6 @@ cleanup() {
 }
 
 trap 'cleanup "unexpected error"' ERR
-trap 'cleanup "completed normally"' EXIT
-
 
 # Build an EC2 bundle and upload/register it to Amazon.
 BUCKET=mirage-blog
@@ -54,7 +52,7 @@ fi
 EBS_DEVICE='/dev/xvdh'
 VOL_RETRY=0
 while true; do
-    [ $VOL_RETRY -lt 10 ] || exit -1
+    [ $VOL_RETRY -lt 30 ] || exit -1
     echo "waiting for volume to become available, attempt $[$VOL_RETRY + 1]"
     sleep 2
     VOL_STATE=`aws ec2 describe-volumes --volume-id $VOL | grep State | sed "s/^[ \t]*\"State\": \"\(.*\)\".*/\1/"`
@@ -93,7 +91,7 @@ echo creating EBS volume snapshot
 SNAPSHOT_ID=`aws ec2 create-snapshot --volume-id $VOL | grep SnapshotId | sed 's/.*\(snap-.*\)".*/\1/'`
 SNAP_RETRY=0
 while true; do
-    [ $SNAP_RETRY -lt 10 ] || exit -1
+    [ $SNAP_RETRY -lt 30 ] || exit -1
     echo "waiting for volume to become available, attempt $[$SNAP_RETRY + 1]"
     sleep 2
     SNAP_STATE=`aws ec2 describe-snapshots --snapshot-id ${SNAPSHOT_ID} | grep State | sed "s/^[ \t]*\"State\": \"\(.*\)\".*/\1/"`
@@ -119,6 +117,6 @@ NEWID=`aws ec2 register-image --name mirage-blog --kernel $KERNEL --architecture
 }
 
 echo "Running instance"
-aws ec2 run-instances --instance-type t1.micro --image-id $NEWID --instance-initiated-shutdown-behavior terminate --dry-run
+aws ec2 run-instances --instance-type t1.micro --image-id $NEWID --instance-initiated-shutdown-behavior terminate
 
 # CNAME swap -- should wait for boot, but it's so fast... confirm port 80
