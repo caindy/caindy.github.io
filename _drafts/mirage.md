@@ -171,6 +171,9 @@ https://alestic.com/2010/12/ec2-user-data-output/
 
 run-instances with --key-name to allow ssh
 
+
+Change `dispatch.ml` to use port 80
+
 TODO
 normalize variable curly brace usage
 lock down policy blog-builder-image-packing on build IAM Role
@@ -178,7 +181,3 @@ lock down policy blog-builder-image-packing on build IAM Role
 Use docker caching to make build not suck
 https://github.com/travis-ci/travis-ci/issues/5358
 https://pages.codeship.com/docker
-
-
-
-
