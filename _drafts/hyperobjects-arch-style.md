@@ -41,7 +41,9 @@ The System-level describes the style as an enterprise architecture, whereas the
 Service-level describes the constraints and behaviors of component services
 within the enterprise architecture. The design space inhabited by this style,
 distributed enterprise systems, necessarily constrains both the services and the
-operating environment in which the interrelate.
+operating environment in which they interrelate.
+
+TODO application or service level?
 
 Contents
 --------
@@ -63,15 +65,12 @@ Motivation
 There are three main themes to the concerns Hyperobjects aims to address:
 fostering serendipity, enterprise architecture in the cloud, and correctness.
 
-Foster Serendipity
+Foster Serendipity[^1]
 ------------------
 
-This verbiage is borrowed from a Steve Vinoski talk about REST. Eric Evan's
-calls it supple architecture. The idea is that our software architectures should
-foster an environment where new requirements are easy to satisfy in a simple
-way. At the enterprise level, such properties included discoverability and
-uniformity, while the application or service level requires composability and
-specificity.
+Eric Evans calls it supple design; the idea is that our architecture
+should foster an environment where new requirements are easy to satisfy in a
+simple way.
 
 Consider services like IFTTT or Zapier that enable non-trivial workflows to be
 built from simple webhook technologies. Our enterprise architectures should be
@@ -79,16 +78,20 @@ at least as accommodating, allowing reactivity across various silos.
 
 At the application level, new requirements usually mean we need to present novel
 and disparate data, effecting new operations in myriad contexts. Technologies
-like Falcor and Relay have ushered in so-called demand-driven development, while
-companies like AWS and Netflix have shown the advantages of creating top-level
-services that aggregate baseline services to provide agility in the application
-layer.
+like Falcor and Relay have ushered in so-called
+[demand-driven architecture](https://www.infoq.com/presentations/domain-driven-architecture),
+while companies like AWS and Netflix have shown the advantages of creating
+top-level services (("experience-based
+apis")[http://www.danieljacobson.com/blog/306]) that aggregate baseline services
+to provide agility and specificity in the
+application layer.
 
-Enterprise Architecture in the Cloud
+Enterprise Architecture in the (Private) Cloud
 ------------------------------------
 
-Non-functional requirements are those without which your system doesn't
-function. So, we should learn from the web and its denizens, we still need to
+>["Non-functional requirements are those that, if not met, will make your system non-functional."](https://twitter.com/M_r_a_x/status/725695757999833090)
+
+So, we should learn from the web and its denizens, we still need to
 apply a high degree of rigor. At the same time, the value equation has changed
 with the cloud. Prior to the cloud era, the solution to our non-functional
 requirements often involved writing big checks to specialized hardware and
@@ -635,3 +638,4 @@ Hyperobject. This is possible because the consistent hashing router, and we
 accept that a subset of aggregates will be unavailable if a node goes down. As
 Joe Armstrong says, availability and horizontal scalability are the same thing.
 
+[^1]: https://www.infoq.com/presentations/vinoski-rest-serendipity
