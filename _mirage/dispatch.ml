@@ -48,6 +48,6 @@ module Main (C:CONSOLE) (FS:KV_RO) (S:Cohttp_lwt.Server) = struct
       let cid = Cohttp.Connection.to_string conn_id in
       C.log c (Printf.sprintf "conn %s closed" cid)
     in
-    http (`TCP 80) (S.make ~conn_closed ~callback ())
+    http (`TCP 8080) (S.make ~conn_closed ~callback ())
 
 end

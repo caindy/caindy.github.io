@@ -1,72 +1,91 @@
 
+# Hyperobjects: An Architectural Style for the Event-Driven Enterprise
+
+_Preface_: To the extent possible, I've tried to write this up without
+introducing any new terminology or concepts to the professional vernacular. So,
+I've assumed familiarity with the concepts detailed in *Domain Driven Design*,
+"Architectural Styles and the Design of Network-based Software Architectures",
+as well as Command Query Responsibility Segregation and Event Sourcing. For the
+sake of clarity, this document discusses things concretely, assuming the use of
+HTTP and JSON over TCP/IP networks.
+
+Earlier versions of this document used the term microservices quite liberally.
+I've eschewed that usage because I do not believe there is sufficient agreement
+on what the terms means for it to be useful here. That being said, there is some
+discussion of Hyperobjects vis-a-vis microservices.
+
+Acknowledgements
+================
+
+> No one can take from us the joy of the first becoming of aware of something,
+> the so-called discovery. But if we also demand the honor, it can be utterly
+> spoiled for us, for we are usually not the first. What does discovery mean,
+> and who can say that he has discovered this or that? After all it's pure
+> idiocy to brag about priority; for it's simply unconscious conceit, not to
+> admit frankly that one is a plagiarist. - Johann Wofgang von Goethe
+
+While I've made an express attempt to acknowledge primary sources where
+appropriate, I feel compelled to specifically acknowledge a few people whose
+writings and presentations have been my primary influences in developing this
+architectural style. So many thanks to Dr. Alan Kay, Dr. Werner Vogels, Eric
+Evans, Dr. Joe Armstrong, Dr. Roy Fielding, Udi Dahan, Dr. Jim Webber, Rich
+Hickey, David Nolen, and Dr. David Luckham.
+
 TL;DR
-======
+-----
 
 Build all of your services as event-sourced, RESTful Bounded Contexts with a
-Uniform Interface of message-orientation and Event-Time semantics, then allow
-them to autonomously organize by emitting hypermedia events on a universal
-backplane. Aggregate these services as necessary to provide built-for-purpose
+Uniform Interface of message-orientation and Event-Time semantics. Allow
+services to autonomously organize by emitting hypermedia events on a universal
+backplane. Aggregate these services as necessary to provide application-specific
 abstractions.
 
 Overview
-========
+--------
+
+> Je n’ai fait celle-ci plus longue que parce que je n’ai pas eu le loisir de la
+> faire plus courte. - Blaise Pascal
+> I would have written a shorter letter, but I didn't have the time. (loose translation)
 
 Hyperobjects is an architectural style for distributed systems whose primary
-design objective is enabling simple, scalable, reliable enterprise-scale cloud
-architectures. Besides the particular organization of components, the primary
-characteristic constraints of this style are as follows.
+design objective is enabling simple, scalable, and reliable enterprise-scale
+cloud architectures. The primary constraints of this style are:
 
-* Hypermedia Event Messages as the engine of System state
-* A uniform interface for all services that:
-  * Models effectful operations as Intent messages that can be batched, allowing
-    clients to synthesize new operations
-  * Incorporates uniform, logical time semantics for all observable values and
-    behaviors enabling:
-    * point-in-time distributed consistency
-    * entity timeline inspection
-    * forking an entity from a previous point-in-time
-    * safe "what-if" operations
-  * Exposes first-class Query operations
-* Command Query Responsibility Segregation
+* Universal Hypermedia Events (UHE): _Hypermedia event messages_ sent across a
+  Universal Backplane as the engine of _Enterprise_ state
+* CQRS+ES: Command Query Responsibility Segregation + Event Sourcing
+* Domain Driven Design Resources (DDDR): Services define a Bounded Context / Aggregate Roots are REST Resources
+* Interactive Intent (II): Aggregates implement uniform Messaging Semantics (Intents) for on-line commands
+* Logical Time (LT): All Aggregate Roots provide uniform Logical Time semantics for all Events and Representations
+* Query-on-Demand (QOD): Services Implement a uniform Client-defined Query Interface
+* Layered + Cient-cache per Fielding
+* Browsable API: Services provide a browser-based interface to interactive documentation
 
-These constraints are combined with others selected from Domain-Driven Design,
-Vogel's Principles of Distributed Computing, Enterprise Integration Patterns,
-message-oriented programming, Representational State Transfer, event sourcing,
-and stream processing. We seek to unify concepts from complementary
-sub-disciplines to create an architectural nomenclature whose information content
-is very high and unambiguous.
+_(Aside: If you are very familiar with Fielding, this alphabet soup my be
+palatable **Browsable L(QOD)C$-DDDR-II-LT-CQRS+ES-UHE**)_
 
-The style is described at two levels: the System-level and the Service-level.
-The System-level describes the style as an enterprise architecture, whereas the
+The style is described at two levels: the Enterprise-level and the Service-level.
+The Enterprise-level describes the style as an enterprise architecture, whereas the
 Service-level describes the constraints and behaviors of component services
 within the enterprise architecture. The design space inhabited by this style,
 distributed enterprise systems, necessarily constrains both the services and the
 operating environment in which they interrelate.
 
-TODO application or service level?
-
-Contents
---------
+### Contents
 
 0. Motivation
-1. Service-level Architecture
-2. System-level Architecture
-3. Discussion
-
-Implementation details are described in terms of common web technologies (JSON,
-HTTP, etc.); the reader is encouraged to generalize. A running example of a
-retail enterprise is used to frame the narrative. The System-level architecture
-is modeled on the principles outlined in Appendix A. A Service-level
-implementation is described in Appendix B.
+1. Defining the Constraints of the Hyperobjects Style 
+2. Hyperobjects System View
+3. Hyperobject Service View
+4. Elaborations and Future Work
 
 Motivation
-==========
+----------
 
 There are three main themes to the concerns Hyperobjects aims to address:
-fostering serendipity, enterprise architecture in the cloud, and correctness.
+fostering serendipity, scalability, and correctness.
 
-Foster Serendipity[^1]
-------------------
+### Foster Serendipity[^1]
 
 Eric Evans calls it supple design; the idea is that our architecture
 should foster an environment where new requirements are easy to satisfy in a
@@ -83,11 +102,11 @@ like Falcor and Relay have ushered in so-called
 while companies like AWS and Netflix have shown the advantages of creating
 top-level services (("experience-based
 apis")[http://www.danieljacobson.com/blog/306]) that aggregate baseline services
-to provide agility and specificity in the
-application layer.
+to provide agility and specificity in the application layer.
 
-Enterprise Architecture in the (Private) Cloud
-------------------------------------
+Primarily the 
+
+### Scalability
 
 >["Non-functional requirements are those that, if not met, will make your system non-functional."](https://twitter.com/M_r_a_x/status/725695757999833090)
 
@@ -108,8 +127,7 @@ scalability and a non-differentiation of service nodes. This is a fundamentally
 different approach from matching hardware to our enterprise SLAs. Stateless,
 fungible service nodes have become the primary building block of the cloud.
 
-Correctness
------------
+### Correctness
 
 In recent years functional programming has made huge in-roads into mainstream
 software development practice. Concomitantly, ideas from FP like immutability
@@ -637,5 +655,31 @@ coordination of reads or writes among the various servers hosting the
 Hyperobject. This is possible because the consistent hashing router, and we
 accept that a subset of aggregates will be unavailable if a node goes down. As
 Joe Armstrong says, availability and horizontal scalability are the same thing.
+
+
+Deletions
+---------
+These constraints are combined with others selected from Domain-Driven Design,
+Vogel's Principles of Distributed Computing, Enterprise Integration Patterns,
+message-oriented programming, Representational State Transfer, event sourcing,
+and stream processing. We seek to unify concepts from complementary
+sub-disciplines to create an architectural nomenclature whose information content
+is very high and unambiguous.
+
+
+* All Command operations are modeled as Intent messages that are POSTed and
+    can be batched atomically, allowing clients to synthesize new operations
+  * Incorporate logical time semantics for all observable values and
+    behaviors enabling:
+    * point-in-time distributed consistency
+    * entity timeline inspection
+    * forking an entity from a previous point-in-time
+    * safe "what-if" operations
+
+Implementation details are described in terms of common web technologies (JSON,
+HTTP, etc.); the reader is encouraged to generalize. A running example of a
+retail enterprise is used to frame the narrative. The System-level architecture
+is modeled on the principles outlined in Appendix A. A Service-level
+implementation is described in Appendix B.
 
 [^1]: https://www.infoq.com/presentations/vinoski-rest-serendipity
