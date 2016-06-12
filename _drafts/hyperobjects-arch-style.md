@@ -382,6 +382,7 @@ A Hyperobject's subscription to itself, used to update QUERY nodes.
 - Logical: potentially implemented by e.g. gossip protocol; the salient feature
   is that it is downstream from the event log
 
+![Hyperobject sketch](./images/Hyperobject.png)
 Discussion
 ==========
 
