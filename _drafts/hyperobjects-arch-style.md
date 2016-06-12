@@ -59,20 +59,20 @@ cloud architectures. The primary constraints of this style are:
 * CQRS+ES: Command Query Responsibility Segregation + Event Sourcing
 * Domain Driven Design Resources (3DR): Services define a Bounded Context /
   Aggregate Roots are REST Resources
-* Interactive Intent (I2): Aggregates implement uniform Messaging Semantics
-  (Intents) for on-line commands
+* Interactive Intent (I2): Aggregates implement uniform messaging semantics,
+  Intents, for on-line (interactive) commands
 * Logical Time (LT): All Aggregate Roots provide uniform Logical Time semantics
   for all Events and Representations
-* Dynamic Query (DQ): Services Implement a uniform dynamic query interface
+* Dynamic Query (DQ): Services must implement a uniform dynamic query interface
 * Layered + Cient-cache per Fielding
-* Browsable API: Services provide a browser-based interface to interactive
-  documentation
+* Browsable API: Services _should_ provide a browser-based interface to
+  interactive documentation
 
 _(If you are very familiar with Fielding, my feeble attempt at emulating
-his concision: **Browsable L(DQ)C$-3DR-I2-LT-CQRS+ES-UHE**)_
+his concision: **(Browsable) LDQC$-3DR-I2-LT-CQRS+ES-UHE**)_
 
-The style is described at two levels: the Enterprise-level and the
-Service-level. The Enterprise-level describes the style as an enterprise
+The style is described at two levels: the System-level and the
+Service-level. The System-level describes the style as an enterprise
 architecture, whereas the Service-level describes the constraints and behaviors
 of component services within the enterprise architecture. The design space
 inhabited by this style, distributed enterprise systems, necessarily constrains
@@ -90,9 +90,13 @@ Motivation
 ----------
 
 There are three main themes to the concerns Hyperobjects aims to address:
-fostering serendipity, scalability, and correctness.
 
-### Foster Serendipity[^1]
+* fostering serendipity
+* simplicity plus ease of implementation
+* scalability is reliability
+* correctness by construction
+
+### Foster Serendipity
 
 Eric Evans calls it supple design; the idea is that our architecture should
 foster an environment where new requirements are easy to satisfy in a simple
@@ -102,37 +106,43 @@ Consider services like IFTTT or Zapier that enable non-trivial workflows to be
 built from simple webhook technologies. Our enterprise architectures should be
 at least as accommodating, allowing reactivity across various silos.
 
-At the application level, new requirements usually mean we need to present novel
-and disparate data, effecting new operations in myriad contexts. Technologies
-like Falcor and Relay have ushered in so-called
+At the application level, new requirements often mean presenting existing
+functionality in slightly different ways: a different view on the same data, or
+a permutation of existing commands. Technologies like Falcor and Relay have ushered in so-called
 [demand-driven architecture](https://www.infoq.com/presentations/domain-driven-architecture),
 while companies like AWS and Netflix have shown the advantages of creating
 top-level services (("experience-based
 apis")[http://www.danieljacobson.com/blog/306]) that aggregate baseline services
 to provide agility and specificity in the application layer.
 
-Primarily the 
+[Fostering serendipity](https://www.infoq.com/presentations/vinoski-rest-serendipity)
+means ensuring the data and commands clients require to acheive their goals are
+readily available without resorting to making goal-specific changes to our
+services.
 
-### Scalability
+### Simplicity Plus Ease of Implementation
 
->["Non-functional requirements are those that, if not met, will make your system non-functional."](https://twitter.com/M_r_a_x/status/725695757999833090)
+> Simplicity is a prerequisite for reliability. - Edsger W. Dijkstra
 
-So, we should learn from the web and its denizens, we still need to
-apply a high degree of rigor. At the same time, the value equation has changed
-with the cloud. Prior to the cloud era, the solution to our non-functional
-requirements often involved writing big checks to specialized hardware and
-software vendors. To a large extent, this option isn't available in the cloud;
-even so, it would obviate the benefits of running in the cloud.
+In his talk,
+["Simple Made Easy"](https://www.infoq.com/presentations/Simple-Made-Easy), Rich
+Hickey emphasized the dangers of conflating simplicity and ease. Others have
+employed the term "pit of success" to describe the intention of making the
+simple and correct approach the easiest to adopt.
 
-Instead we should seek to leverage the cloud offerings to satisfy our enterprise
-requirements, while keeping the cloud fungible, retaining ability to move between
-clouds and/or on-premises. To do so we need an enterprise architecture that can be
-served using PaaS offerings that are more or less homogeneous across clouds.
+### Scalability is Reliability
 
-Finally, the very nature of the cloud implies an architectural focus on
-scalability and a non-differentiation of service nodes. This is a fundamentally
-different approach from matching hardware to our enterprise SLAs. Stateless,
-fungible service nodes have become the primary building block of the cloud.
+>["Non-functional requirements are those that, if not met, will make your system non-functional." - Andrew Clay Shafer](https://twitter.com/M_r_a_x/status/725695757999833090)
+
+[Joe Armstrong offers this syllogism](https://www.infoq.com/presentations/self-heal-scalable-system):
+> Fault tolerance implies scalability
+> * To make things fault-tolerant we have to make sure they are made from isolated components
+> * If the components are isolated they can be run in parallel
+> * Things that are isolated and can be run in parallel are scalable
+
+As Werner Vogels espoused, services should make progress under all
+circumstances. We must build our services to work asynchronously, independently,
+and we will get scalability as a consequence of this fault tolerance.
 
 ### Correctness
 
@@ -688,5 +698,20 @@ HTTP, etc.); the reader is encouraged to generalize. A running example of a
 retail enterprise is used to frame the narrative. The System-level architecture
 is modeled on the principles outlined in Appendix A. A Service-level
 implementation is described in Appendix B.
+So, we should learn from the web and its denizens, we still need to
+apply a high degree of rigor. At the same time, the value equation has changed
+with the cloud. Prior to the cloud era, the solution to our non-functional
+requirements often involved writing big checks to specialized hardware and
+software vendors. To a large extent, this option isn't available in the cloud;
+even so, it would obviate the benefits of running in the cloud.
 
-[^1]: https://www.infoq.com/presentations/vinoski-rest-serendipity
+Instead we should seek to leverage the cloud offerings to satisfy our enterprise
+requirements, while keeping the cloud fungible, retaining ability to move between
+clouds and/or on-premises. To do so we need an enterprise architecture that can be
+served using PaaS offerings that are more or less homogeneous across clouds.
+
+Finally, the very nature of the cloud implies an architectural focus on
+scalability and a non-differentiation of service nodes. This is a fundamentally
+different approach from matching hardware to our enterprise SLAs. Stateless,
+fungible service nodes have become the primary building block of the cloud.
+
