@@ -37,14 +37,17 @@ TL;DR
 Build all of your services as event-sourced, RESTful Bounded Contexts with a
 Uniform Interface of message-orientation and Event-Time semantics. Allow
 services to autonomously organize by emitting hypermedia events on a universal
-backplane. Aggregate these services as necessary to provide application-specific
+backplane. Aggregate these services as necessary to provide purpose-specific
 abstractions.
+
+![Hyperobject sketch](./images/Hyperobject.png)
 
 Overview
 --------
 
 > Je n’ai fait celle-ci plus longue que parce que je n’ai pas eu le loisir de la
 > faire plus courte. - Blaise Pascal
+
 > I would have written a shorter letter, but I didn't have the time. (loose translation)
 
 Hyperobjects is an architectural style for distributed systems whose primary
@@ -54,22 +57,26 @@ cloud architectures. The primary constraints of this style are:
 * Universal Hypermedia Events (UHE): _Hypermedia event messages_ sent across a
   Universal Backplane as the engine of _Enterprise_ state
 * CQRS+ES: Command Query Responsibility Segregation + Event Sourcing
-* Domain Driven Design Resources (DDDR): Services define a Bounded Context / Aggregate Roots are REST Resources
-* Interactive Intent (II): Aggregates implement uniform Messaging Semantics (Intents) for on-line commands
-* Logical Time (LT): All Aggregate Roots provide uniform Logical Time semantics for all Events and Representations
-* Query-on-Demand (QOD): Services Implement a uniform Client-defined Query Interface
+* Domain Driven Design Resources (3DR): Services define a Bounded Context /
+  Aggregate Roots are REST Resources
+* Interactive Intent (I2): Aggregates implement uniform Messaging Semantics
+  (Intents) for on-line commands
+* Logical Time (LT): All Aggregate Roots provide uniform Logical Time semantics
+  for all Events and Representations
+* Dynamic Query (DQ): Services Implement a uniform dynamic query interface
 * Layered + Cient-cache per Fielding
-* Browsable API: Services provide a browser-based interface to interactive documentation
+* Browsable API: Services provide a browser-based interface to interactive
+  documentation
 
-_(Aside: If you are very familiar with Fielding, this alphabet soup my be
-palatable **Browsable L(QOD)C$-DDDR-II-LT-CQRS+ES-UHE**)_
+_(If you are very familiar with Fielding, my feeble attempt at emulating
+his concision: **Browsable L(DQ)C$-3DR-I2-LT-CQRS+ES-UHE**)_
 
-The style is described at two levels: the Enterprise-level and the Service-level.
-The Enterprise-level describes the style as an enterprise architecture, whereas the
-Service-level describes the constraints and behaviors of component services
-within the enterprise architecture. The design space inhabited by this style,
-distributed enterprise systems, necessarily constrains both the services and the
-operating environment in which they interrelate.
+The style is described at two levels: the Enterprise-level and the
+Service-level. The Enterprise-level describes the style as an enterprise
+architecture, whereas the Service-level describes the constraints and behaviors
+of component services within the enterprise architecture. The design space
+inhabited by this style, distributed enterprise systems, necessarily constrains
+both the services and environment in which services interrelate.
 
 ### Contents
 
@@ -87,9 +94,9 @@ fostering serendipity, scalability, and correctness.
 
 ### Foster Serendipity[^1]
 
-Eric Evans calls it supple design; the idea is that our architecture
-should foster an environment where new requirements are easy to satisfy in a
-simple way.
+Eric Evans calls it supple design; the idea is that our architecture should
+foster an environment where new requirements are easy to satisfy in a simple
+way.
 
 Consider services like IFTTT or Zapier that enable non-trivial workflows to be
 built from simple webhook technologies. Our enterprise architectures should be
@@ -380,9 +387,8 @@ A Hyperobject's subscription to itself, used to update QUERY nodes.
 - Bypass Content Filter
 - Makes progress even while Circuit Breaker is tripped
 - Logical: potentially implemented by e.g. gossip protocol; the salient feature
-  is that it is downstream from the event log
+  is that it is downstream from the event store
 
-![Hyperobject sketch](./images/Hyperobject.png)
 Discussion
 ==========
 
