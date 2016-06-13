@@ -106,11 +106,12 @@ at least as accommodating, allowing reactivity across various silos.
 
 At the application level, new requirements often mean presenting existing
 functionality in slightly different ways: a different view on the same data, or
-a permutation of existing commands. Technologies like Falcor and Relay have ushered in so-called
+a permutation of existing commands. Technologies like Falcor and Relay have
+ushered in so-called
 [demand-driven architecture](https://www.infoq.com/presentations/domain-driven-architecture),
 while companies like AWS and Netflix have shown the advantages of creating
-top-level services (("experience-based
-apis")[http://www.danieljacobson.com/blog/306]) that aggregate baseline services
+top-level services, ("experience-based
+apis")[http://www.danieljacobson.com/blog/306], that aggregate baseline services
 to provide agility and specificity in the application layer.
 
 [Fostering serendipity](https://www.infoq.com/presentations/vinoski-rest-serendipity)
@@ -130,6 +131,7 @@ simple and correct approach the easiest to adopt.
 ### Scalability and Reliability
 
 >["Non-functional requirements are those that, if not met, will make your system non-functional." - Andrew Clay Shafer](https://twitter.com/M_r_a_x/status/725695757999833090)
+
 
 > A distributed system is one in which the failure of a computer you didn't even
 > know existed can render your own computer unusable. - Leslie Lamport
