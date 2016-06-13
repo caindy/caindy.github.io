@@ -3,11 +3,11 @@
 
 _Preface_: To the extent possible, I've tried to write this up without
 introducing any new terminology or concepts to the professional vernacular. So,
-I've assumed familiarity with the concepts detailed in *Domain Driven Design*,
-"Architectural Styles and the Design of Network-based Software Architectures",
-as well as Command Query Responsibility Segregation and Event Sourcing. For the
-sake of clarity, this document discusses things concretely, assuming the use of
-HTTP and JSON over TCP/IP networks.
+I've assumed familiarity with the concepts detailed in *Domain Driven Design* [DDD],
+"Architectural Styles and the Design of Network-based Software Architectures"
+[Fielding], as well as Command Query Responsibility Segregation and Event
+Sourcing. For the sake of clarity, this document discusses things concretely,
+assuming the use of HTTP and JSON over TCP/IP networks.
 
 Earlier versions of this document used the term microservices quite liberally.
 I've eschewed that usage because I do not believe there is sufficient agreement
@@ -48,7 +48,7 @@ Overview
 > Je n’ai fait celle-ci plus longue que parce que je n’ai pas eu le loisir de la
 > faire plus courte. - Blaise Pascal
 
-> I would have written a shorter letter, but I didn't have the time. (loose translation)
+> I would have written a shorter letter, but I didn't have the time.
 
 Hyperobjects is an architectural style for distributed systems whose primary
 design objective is enabling simple, scalable, and reliable enterprise-scale
@@ -64,12 +64,12 @@ cloud architectures. The primary constraints of this style are:
 * Logical Time (LT): All Aggregate Roots provide uniform Logical Time semantics
   for all Events and Representations
 * Dynamic Query (DQ): Services must implement a uniform dynamic query interface
-* Layered + Cient-cache per Fielding
+* Layered + Cient-cache + Uniform Interface per Fielding
 * Browsable API: Services _should_ provide a browser-based interface to
   interactive documentation
 
 _(If you are very familiar with Fielding, my feeble attempt at emulating
-his concision: **(Browsable) LDQC$-3DR-I2-LT-CQRS+ES-UHE**)_
+his concision: **(Browsable) LC$U-DQ-3DR-I2-LT-CQRS+ES-UHE**)_
 
 The style is described at two levels: the System-level and the
 Service-level. The System-level describes the style as an enterprise
@@ -78,31 +78,29 @@ of component services within the enterprise architecture. The design space
 inhabited by this style, distributed enterprise systems, necessarily constrains
 both the services and environment in which services interrelate.
 
-### Contents
+## Contents
 
 0. Motivation
 1. Defining the Constraints of the Hyperobjects Style 
-2. Hyperobjects System View
-3. Hyperobject Service View
-4. Elaborations and Future Work
+2. Service View
+3. System View
+4. Elaborations; Related and Future Work
 
 Motivation
 ----------
 
-There are three main themes to the concerns Hyperobjects aims to address:
+There are four main themes to the concerns Hyperobjects aims to address:
 
 * fostering serendipity
-* simplicity plus ease of implementation
-* scalability is reliability
-* correctness by construction
+* simplicity and ease of implementation
+* scalability and reliability
+* correctness and time
 
 ### Foster Serendipity
 
 Eric Evans calls it supple design; the idea is that our architecture should
 foster an environment where new requirements are easy to satisfy in a simple
-way.
-
-Consider services like IFTTT or Zapier that enable non-trivial workflows to be
+way. Consider services like IFTTT or Zapier that enable non-trivial workflows to be
 built from simple webhook technologies. Our enterprise architectures should be
 at least as accommodating, allowing reactivity across various silos.
 
@@ -120,17 +118,16 @@ means ensuring the data and commands clients require to acheive their goals are
 readily available without resorting to making goal-specific changes to our
 services.
 
-### Simplicity Plus Ease of Implementation
+### Simplicity and Ease of Implementation
 
 > Simplicity is a prerequisite for reliability. - Edsger W. Dijkstra
 
-In his talk,
-["Simple Made Easy"](https://www.infoq.com/presentations/Simple-Made-Easy), Rich
-Hickey emphasized the dangers of conflating simplicity and ease. Others have
-employed the term "pit of success" to describe the intention of making the
+In ["Simple Made Easy"](https://www.infoq.com/presentations/Simple-Made-Easy),
+Rich Hickey emphasized the dangers of conflating simplicity and ease. Others
+have employed the term "pit of success" to describe the intention of making the
 simple and correct approach the easiest to adopt.
 
-### Scalability is Reliability
+### Scalability and Reliability Reliability
 
 >["Non-functional requirements are those that, if not met, will make your system non-functional." - Andrew Clay Shafer](https://twitter.com/M_r_a_x/status/725695757999833090)
 
@@ -144,7 +141,10 @@ As Werner Vogels espoused, services should make progress under all
 circumstances. We must build our services to work asynchronously, independently,
 and we will get scalability as a consequence of this fault tolerance.
 
-### Correctness
+### Correctness and Time
+
+> A distributed system is one in which the failure of a computer you didn't even
+> know existed can render your own computer unusable. - Leslie Lamport
 
 In recent years functional programming has made huge in-roads into mainstream
 software development practice. Concomitantly, ideas from FP like immutability
@@ -152,35 +152,24 @@ have found their way into traditional enterprise OOP. Reactive Programming is
 driving many of the innovations in front-end development, and CRDTs are seeing
 broader adoption. Finally, testing techniques and tools abound alongside
 academic innovations in theorem proving, property-based testing, concolic
-testing, and other analysis techniques.
+testing, and other automated analysis techniques.
 
 The salient point in all of these examples is an emphasis on correctness,
-specifically on building confidence in the software we are shipping; a
-confidence that is prerequisite to the enterprise agility promised by continuous
-delivery. In particular, state and time are hard; we want to make them easy by
-simplifying and rigorously controlling how they are handled.
+specifically on building confidence in the software we are shipping; this
+confidence is a prerequisite for continuous delivery. Distributed systems entail
+a reality of eventual consistency and regular failure. In particular, state and
+time are hard; we want to make them easy by simplifying and rigorously
+controlling how they are handled.
 
-What we desire is a cloud native architecture that acts in concert with these
-innovations, lifting these ideas into the systems architecture, to enable
-agility while helping to ensure correctness, though we are forced to accept a
-relaxed definition of correctness as distributed systems establish a reality of
-eventual consistency and regular failure. Valuing simplicity, clarity and
-generality above all, we wish to resolve the tension between these cloud era
-realities and our existing tools by obviating these concerns for individual
-services.
-
-The most critical aspect of correctness is simplicity. To that end our
-architectural aim is to define simple components that can be composed in simple
-ways to create solutions easily.
-
-Service-level Architecture
+Service View
 ==========================
 
 The primary building block of the Hyperobjects style are Hyperobjects
 themselves. These are autonomous services that own a well-defined area of
-knowledge in our enterprise. They are connected by a universal backplane
-(described in System-level Architecture) and are aggregated and/or proxied by
-Application Gateways (aka View Model servers, Frontend Servers) as necessary.
+knowledge, a Bounded Context, in our enterprise. They are connected by a
+universal backplane described in System-level Architecture and are aggregated
+and/or proxied by Application Gateways (aka View Model servers, Frontend
+Servers, Experience-based APIs) as necessary.
 
 To understand the Service-level architecture, we need to establish some
 terminology.
@@ -203,19 +192,18 @@ Or,
 
 ### Intents
 
-Clients get work done by sending Command Messages to Services. These are called Intents
-to reflect both their provisional nature (versus simply Command) and their role in the
-service design (capturing the intention of the user or system-actor).
+Clients get work done by sending Command Messages to Services. These are called
+Intents to reflect both their provisional nature and their role in the service
+design--capturing the intention of the user or system-actor. In practice,
+modeling intent messages is a powerful tool for knowledge crunching (DDD).
 
-Intents are part of the Uniform Interface in that they define a standard
-envelope format for all Command Messages sent to the REST interface of services;
-to wit:
+Intents are part of the Uniform Interface for Hyperobjects; they define the
+following standard envelope format for all Command Messages sent to the
+interactive interface of services.
 
-- Activity Name: nominates the semantics for the Data property
-- Id: correlation identifier (see EIP) returned in the Resource Representation,
-  opaque to service
+- Activity Name: names the Intent, nominating the semantics for the Data property
+- Id: correlation identifier returned in the Resource Representation, opaque to service
 - Data: a JSON object representing the Command Message 
-- Abriged Example:
 
 ```
 POST /consumer-shopping-cart/42924579adkfajl32792i98f98
@@ -227,8 +215,6 @@ POST /consumer-shopping-cart/42924579adkfajl32792i98f98
   }
 }
 ```
-
-(TODO: footnote on intents as a tool for knowledge crunching and discovery)
 
 ### Events
 
@@ -248,23 +234,31 @@ Store     :: Event  -> void?
 Project   :: State' -> HTTP Response
 ```
 
-Note that outputs in question, e.g. `Intent?`, indicate a possible point of early
-exit from the pipeline should the stage fail (i.e. malformed requests). A
-further caveat: this presentation of the Hyperobject pipeline is a slightly
-simplified version of how POST is handled within an Aggregate.
+Note that outputs in question, e.g. `Intent?`, indicate a possible point of
+early exit from the pipeline should the stage fail, due to e.g. a malformed
+request. A further caveat: this presentation of the Hyperobject pipeline is a
+slightly simplified version of how a POSTed Intent is handled within an
+Aggregate Root.
 
 
-#### Note on Durability
+#### Event Store Geoplex
 
-Jim Gray "geoplex": clustered servers in same location
-Until an event is written here, it didn't happen. Why not use a queue? Need to
-select entire history atomically and consistently when spinning up Aggregate
-Root.
+Until an event is written here, it didn't happen.
 
-Intents should be logged separately along with the Revision URL that resulted, if applicable.
+In describing disaster tolerance, Jim Gray coined the term
+[_geoplex_](https://arxiv.org/pdf/cs/9912010.pdf) to describe a collection of
+"farms" for the duplication of data, hardware, and applications at one or more
+geographically remote locations. I will use the term as a verb; to geoplex
+is to ensure that data is committed atomically to disparate geographic
+locations.
 
-RESTful Domain-Driven Design
-----------------------------
+The geoplexing requirement might be relaxed for deployments that have weaker
+disaster recovery guarantees, and we will discuss other requirements for a
+Hyperobjects event store. Other presentations may refer to this store as a
+replicated event log, but I wish to emphasize that the requirements of the store
+may be satisfied by many backends.
+
+### RESTful Domain-Driven Design
 
 Services in Hyperobjects implement a single Bounded Context, and expose it via
 RESTful interface.
@@ -283,42 +277,43 @@ https://consumer-shopping-context.contoso.com/consumer-shopping-cart/42924579adk
         \--------- bounded context ---------/\---- aggregate ------/\--- aggregate root id ---/
 ```
 
-### API Surfaces
+#### API Surfaces
 
 All Hyperobjects URLs are translucent identifiers with regular structure that delineate
-constituent API surfaces.
+constituent API surfaces. There are four primary URL types.
 
 - Bounded Context  
   //**consumer-shopping-context.contoso.com**/  
   Exposes service metadata (available Intents, Event Activities)  
-  Also serves as entry-point for interactive documentation  
+  Also serves as entry-point for browsable interactive documentation  
   
-- Aggregates  
+- Aggregate  
   //consumer-shopping-context.contoso.com/**consumer-shopping-cart**/  
   Exposes Query surface for a Resource Type e.g. Shopping Carts  
   Admits creation of new aggregate roots  
 
-- Continuants  
+- Continuant  
   //consumer-shopping-context.contoso.com/consumer-shopping-cart/**42924579adkfajl32792i98f98**  
   Nominates the "current" version of a particular Aggregate Root  
   Primary API surface, implements domain operations (i.e. POSTed Intents)  
 
-- Revisions  
+- Revision  
   //consumer-shopping-context.contoso.com/consumer-shopping-cart/42924579adkfajl32792i98f98/**101**  
   Nominates an Aggregate Root at a particular point-in-event-time, e.g. 101  
   Generally exposes the same operational semantics as the Continuant, but
   results in a new Aggregate Root, a fork of the original at the point-in-event-time
   nominated by the Revision
 
-Event-Time
-----------
+### Event-Time
 
-Every write operation (processed Intent) on an Aggregate Root is linearized,
-since time-ordering requires a single arbiter of order (TODO footnote about
-relativity, also single-node ownership of in-memory data store). As outlined
-above there are two effects in the processing environment:
+Every Aggregate Root has it's own logical clock.
 
-* Encapsulated: the resultant Event is stored in a private (geoplexed) Event Log
+POSTed Intents are the only write operations in Hyperobjects. Every write
+operation is linearized, since time-ordering requires a single arbiter of order
+and single-writer models are simple, performant, and robust. There are two
+effects in the processing environment:
+
+* Encapsulated: the resultant Event is stored in a private (geoplexed) Event Store
   (eventually replicated into Event Stream)
 * Observable: the HTTP response containing a Representation of the new projected state
 
@@ -327,13 +322,16 @@ Recall the Revision URL has an positive integer as its final component; this
 number acts as an independent logical clock for each Aggregate Root, defining
 Event-Time (versus Processing Time) for every Entity within the Aggregate Root.
 
-(In Hyperobjects, there is no global time, and processing time--aka wall-clock
-time--is only interesting insofar as it is leveraged by Stream Processors (TODO
-define) to create Posets and windows. see Stream Processing 101 article)
+In Hyperobjects, there is no global time, and processing time--aka wall-clock
+time--is only interesting insofar as it is leveraged by Event Processors to
+create partially-ordered event sets (see posets in Luckham) and
+[windows](https://www.oreilly.com/ideas/the-world-beyond-batch-streaming-101).
 
-Thus, every 200-level (successful) response contains a Representation of a
-particular *Revision* of an Aggregate Root. Both that revision and the Event
-that engendered the it can be identified by the Event-Time.
+### Revisions
+
+Thus, every 200-level (successful) response contains a Representation
+of a particular *Revision* of an Aggregate Root. Both that revision and the
+Event that engendered it can be identified by the Event-Time.
 
 Putting it All Together
 -----------------------
@@ -344,7 +342,6 @@ Putting it All Together
 
 ### Application Gateways
 
-TODO Netflix and AWS references 
 
 System-level
 ============
@@ -715,3 +712,7 @@ scalability and a non-differentiation of service nodes. This is a fundamentally
 different approach from matching hardware to our enterprise SLAs. Stateless,
 fungible service nodes have become the primary building block of the cloud.
 
+Why not
+use a queue? Need to select entire history atomically and consistently when
+spinning up Aggregate Root. Intents should be logged separately along with the
+Revision URL that resulted, if applicable.
