@@ -2,12 +2,19 @@
 Hyperobjects: An Architectural Style for the Event-Driven Enterprise
 ====================================================================
 
-_Preface_: To the extent possible, I've tried to write this up without
-introducing any new terminology or concepts to the professional vernacular. So,
-I've assumed familiarity with the concepts detailed in *Domain Driven Design*
-[DDD], "Architectural Styles and the Design of Network-based Software
-Architectures" [Fielding], *Enterprise Integration Patterns* [Hohpe], as well as
-Command Query Responsibility Segregation and Event Sourcing. For the sake of
+Introduction
+------------
+
+This document is an attempt to describe an architectural style I call
+Hyperobjects. I'm documenting it because I've found it useful in
+building enterprise systems, and I'm hopeful that it could serve others.
+
+To the extent possible, I've tried to write this up without introducing any new
+terminology or concepts to the professional vernacular. So, I've assumed
+familiarity with the concepts detailed in *Domain Driven Design* [DDD],
+"Architectural Styles and the Design of Network-based Software Architectures"
+[Fielding], *Enterprise Integration Patterns* [Hohpe], as well as Command Query
+Responsibility Segregation (Dahan) and Event Sourcing (Young). For the sake of
 clarity, this document discusses things concretely, assuming the use of HTTP and
 JSON over TCP/IP networks.
 
@@ -28,9 +35,9 @@ section there is some discussion of Hyperobjects vis-à-vis microservices.
 While I've made an express attempt to acknowledge primary sources where
 appropriate, I feel compelled to specifically acknowledge a few people whose
 writings and presentations have been my primary influences in developing this
-architectural style. Many thanks to Dr. Alan Kay, Dr. Werner Vogels, Eric
-Evans, Dr. Joe Armstrong, Dr. Roy Fielding, Udi Dahan, Dr. Jim Webber, Rich
-Hickey, David Nolen, and Dr. David Luckham.
+architectural style. Thank you Alan Kay, Werner Vogels, Eric Evans, Joe
+Armstrong, Roy Fielding, Udi Dahan, Greg Young, Jim Webber, Rich Hickey, David
+Nolen, and David Luckham.
 
 TL;DR
 -----
@@ -111,8 +118,8 @@ a permutation of existing commands. Technologies like Falcor and Relay have
 ushered in so-called
 [demand-driven architecture](https://www.infoq.com/presentations/domain-driven-architecture),
 while companies like AWS and Netflix have shown the advantages of creating
-top-level services, ("experience-based
-apis")[http://www.danieljacobson.com/blog/306], that aggregate baseline services
+top-level services, ["experience-based
+apis"](http://www.danieljacobson.com/blog/306), that aggregate baseline services
 to provide agility and specificity in the application layer.
 
 [Fostering serendipity](https://www.infoq.com/presentations/vinoski-rest-serendipity)
@@ -166,6 +173,75 @@ a reality of eventual consistency and regular failure. In particular, state and
 time are hard; we want to make them easy by simplifying and rigorously
 controlling how they are handled.
 
+
+Defining the Constraints of the Hyperobjects Style 
+==================================================
+
+**(Browsable) LC$U-DQ-3DR-I2-ET-CQRS+ES-UHE**
+
+### Domain Driven Design Resources
+
+Services in Hyperobjects implement a single Bounded Context, and expose it via
+RESTful interface.
+
+-------------------------------------------------------------------------
+| DDD Concept                      | REST Concept                       |
+|----------------------------------|-------------------------------------
+| Bounded Context                  | Network Domain                     | 
+| Aggregate                        | Resource Type                      | 
+| Aggregate Root                   | Resource Instance                  |
+| Value in Event Time of an Entity | Representation                     |
+| Entity                           | Only accessible via Aggregate Roots|
+
+```
+https://consumer-shopping-context.contoso.com/consumer-shopping-cart/42924579adkfajl32792i98f98
+        \--------- bounded context ---------/\---- aggregate ------/\--- aggregate root id ---/
+```
+
+The primary benefit of this constraint is uniformity of implementation.
+
+### Event-Time
+
+Every Aggregate Root has it's own logical clock. As it changes, this clock is
+incremented and used in all identifiers exposed by the service. In this way the
+system is made explicitly aware of a resource's location in space and time in
+all communications.
+
+By constraining all service interactions to have explicit, regular spacetime
+semantics, we can ameliorate an entire class of bugs related to causality,
+improve the debuggability of our systems, and introduce novel capabilties such as:
+
+* point-in-time distributed consistency
+* entity timeline inspection
+* forking an entity from a previous point-in-time
+* safe "what-if" operations
+
+### Interactive Intents
+
+Clients get work done by sending Command Messages to Services. These are called
+Intents to reflect both their provisional nature and their role in the service
+design--capturing the intention of the user or system-actor. In practice,
+Intent modeling is a powerful tool for knowledge crunching (DDD).
+
+Intents are part of the Uniform Interface for Hyperobjects; they define a
+standard envelope format for all Command Messages sent to the interactive
+interface of services.
+
+### Dynamic Query
+
+### Universal Hypermedia Events
+
+### Uniform Interface
+
+
+### Browsable APIs: Interactive Documentation
+* Amundsen
+* Vs Swagger UI
+* Datomic
+
+
+### REST
+
 Service View
 ============
 
@@ -182,29 +258,53 @@ terminology.
 Hyperobject Concepts
 --------------------
 
-### Activity Name
+Hyperobjects have two primary external interfaces: an Interactive Interface that
+exhibits Command-Query Responsibility Segregation and a Reactive Interface that
+connects to the universal backplane for hypermedia events.
 
-URNs of the form `urn:tenant:bounded-context:entity:verb`, denoting either an
-Intent (imperative) or an Event (past-participle), e.g.:
+![Hyperobject sketch](./images/Hyperobject.png)
 
-- Intent URN: `urn:com:contoso:consumer-shopping:cart:checkout`
-- Event URN:  `urn:com:contoso:consumer-shopping:cart:checkout-succeeded`
+### Interactive Inteface
 
-Or,
+The Command side of the Interactive Interface is shaped by CQRS, 3DR, and I2.
 
-- Intent URN: `urn:com:contoso:consumer-shopping:bundle:add-item`
-- Event URN:  `urn:com:contoso:consumer-shopping:bundle:item-added`
+```
+https://consumer-shopping-context.contoso.com/consumer-shopping-cart/42924579adkfajl32792i98f98
+        \--------- bounded context ---------/\---- aggregate ------/\--- aggregate root id ---/
+```
+All Hyperobjects URLs are translucent identifiers with regular structure that delineate
+constituent API surfaces. There are four primary URL types.
 
-### Intents
+- Bounded Context  
+  //**consumer-shopping-context.contoso.com**/  
+  Exposes service metadata (available Intents, Event Activities)  
+  Also serves as entry-point for browsable interactive documentation  
+  
+- Aggregate  
+  //consumer-shopping-context.contoso.com/**consumer-shopping-cart**/  
+  Exposes Query surface for a Resource Type e.g. Shopping Carts  
+  Admits creation of new aggregate roots  
 
-Clients get work done by sending Command Messages to Services. These are called
-Intents to reflect both their provisional nature and their role in the service
-design--capturing the intention of the user or system-actor. In practice,
-Intent modeling is a powerful tool for knowledge crunching (DDD).
+- Continuant  
+  //consumer-shopping-context.contoso.com/consumer-shopping-cart/**42924579adkfajl32792i98f98**  
+  Nominates the "current" version of a particular Aggregate Root  
+  Primary API surface, implements domain operations (i.e. POSTed Intents)  
 
-Intents are part of the Uniform Interface for Hyperobjects; they define the
-following standard envelope format for all Command Messages sent to the
-interactive interface of services.
+- Revision  
+  //consumer-shopping-context.contoso.com/consumer-shopping-cart/42924579adkfajl32792i98f98/**101**  
+  Nominates an Aggregate Root at a particular point-in-event-time, e.g. 101  
+  Generally exposes the same operational semantics as the Continuant, but
+  results in a new Aggregate Root, a fork of the original at the point-in-event-time
+  nominated by the Revision
+
+#### Revisions
+
+Thus, every 200-level (successful) response contains a Representation
+of a particular *Revision* of an Aggregate Root. Both that revision and the
+Event that engendered it can be identified by the Event-Time. Since history is
+immutable, the Revision can be permanently cached by clients.
+
+### Intent Messages
 
 - Activity Name: names the Intent, nominating the semantics for the Data property
 - Id: correlation identifier returned in the Resource Representation, opaque to service
@@ -220,12 +320,55 @@ POST /consumer-shopping-cart/42924579adkfajl32792i98f98
   }
 }
 ```
+#### Activity Name
+
+URNs of the form `urn:tenant:bounded-context:entity:verb`, denoting either an
+Intent (imperative) or an Event (past-participle), e.g.:
+
+- Intent URN: `urn:com:contoso:consumer-shopping:cart:checkout`
+- Event URN:  `urn:com:contoso:consumer-shopping:cart:checkout-succeeded`
+
+Or,
+
+- Intent URN: `urn:com:contoso:consumer-shopping:bundle:add-item`
+- Event URN:  `urn:com:contoso:consumer-shopping:bundle:item-added`
+
+
+### Dynamic Query
+
+* QUERY verb
+* Query preprocessor
+* Subscriptions
+
 
 ### Events
 
 - A Value that serves as the record that a particular business activity has transpired
 - Not always in one-to-one correspondence to an Intent, but can usually be
   viewed semantically as the "past tense" of an Intent.
+
+Recall that every Aggregate Root has it's own logical clock. This is enabled by
+Event Sourcing.
+
+POSTed Intents are the only write operations in Hyperobjects. Every write
+operation is linearized, since time-ordering requires a single arbiter of order
+and single-writer models are simple, performant, and robust. There are two
+effects in the processing environment:
+
+* Encapsulated: the resultant Event is stored in a private (geoplexed) Event Store
+  which is eventually replicated into universal backplane as a hypermedia event
+* Observable: the HTTP response containing a Representation of the new projected state
+
+Both of these effects are associated with a new identifier: the Revision URL.
+Recall the Revision URL has an positive integer as its final component; this
+number acts as an independent logical clock for each Aggregate Root, defining
+Event-Time (versus Processing Time) for every Entity within the Aggregate Root.
+
+In Hyperobjects, there is no global time, and processing time--that is, wall-clock
+time when an event was received--is only interesting insofar as it is leveraged
+by Event Processors to create partially-ordered sets of events (see posets in
+Luckham) or [windowing](https://www.oreilly.com/ideas/the-world-beyond-batch-streaming-101).
+
 
 To understand the relationship between Intents, Events, and the HTTP
 request/response, it's easiest to look at the request processing pipeline of a
@@ -263,88 +406,6 @@ Hyperobjects event store. Other presentations may refer to this store as a
 replicated event log, but I wish to emphasize that the requirements of the store
 may be satisfied by many backends.
 
-### RESTful Domain-Driven Design
-
-Services in Hyperobjects implement a single Bounded Context, and expose it via
-RESTful interface.
-
--------------------------------------------------------------------------
-| DDD Concept                      | REST Concept                       |
-|----------------------------------|-------------------------------------
-| Bounded Context                  | Network Domain                     | 
-| Aggregate                        | Resource Type                      | 
-| Aggregate Root                   | Resource Instance                  |
-| Value in Event Time of an Entity | Representation                     |
-| Entity                           | Only accessible via Aggregate Roots|
-
-```
-https://consumer-shopping-context.contoso.com/consumer-shopping-cart/42924579adkfajl32792i98f98
-        \--------- bounded context ---------/\---- aggregate ------/\--- aggregate root id ---/
-```
-
-#### API Surfaces
-
-All Hyperobjects URLs are translucent identifiers with regular structure that delineate
-constituent API surfaces. There are four primary URL types.
-
-- Bounded Context  
-  //**consumer-shopping-context.contoso.com**/  
-  Exposes service metadata (available Intents, Event Activities)  
-  Also serves as entry-point for browsable interactive documentation  
-  
-- Aggregate  
-  //consumer-shopping-context.contoso.com/**consumer-shopping-cart**/  
-  Exposes Query surface for a Resource Type e.g. Shopping Carts  
-  Admits creation of new aggregate roots  
-
-- Continuant  
-  //consumer-shopping-context.contoso.com/consumer-shopping-cart/**42924579adkfajl32792i98f98**  
-  Nominates the "current" version of a particular Aggregate Root  
-  Primary API surface, implements domain operations (i.e. POSTed Intents)  
-
-- Revision  
-  //consumer-shopping-context.contoso.com/consumer-shopping-cart/42924579adkfajl32792i98f98/**101**  
-  Nominates an Aggregate Root at a particular point-in-event-time, e.g. 101  
-  Generally exposes the same operational semantics as the Continuant, but
-  results in a new Aggregate Root, a fork of the original at the point-in-event-time
-  nominated by the Revision
-
-### Event-Time
-
-Every Aggregate Root has it's own logical clock.
-
-POSTed Intents are the only write operations in Hyperobjects. Every write
-operation is linearized, since time-ordering requires a single arbiter of order
-and single-writer models are simple, performant, and robust. There are two
-effects in the processing environment:
-
-* Encapsulated: the resultant Event is stored in a private (geoplexed) Event Store
-  (eventually replicated into Event Stream)
-* Observable: the HTTP response containing a Representation of the new projected state
-
-Both of these effects are associated with a new identifier: the Revision URL.
-Recall the Revision URL has an positive integer as its final component; this
-number acts as an independent logical clock for each Aggregate Root, defining
-Event-Time (versus Processing Time) for every Entity within the Aggregate Root.
-
-In Hyperobjects, there is no global time, and processing time--aka wall-clock
-time--is only interesting insofar as it is leveraged by Event Processors to
-create e.g. partially-ordered event sets (see posets in Luckham) or
-[windows](https://www.oreilly.com/ideas/the-world-beyond-batch-streaming-101).
-
-### Revisions
-
-Thus, every 200-level (successful) response contains a Representation
-of a particular *Revision* of an Aggregate Root. Both that revision and the
-Event that engendered it can be identified by the Event-Time. Since history is
-immutable, the Revision can be permanently cached.
-
-### Dynamic Query
-
-* QUERY verb
-* Query preprocessor
-* Subscriptions
-
 Putting it All Together
 -----------------------
 
@@ -357,7 +418,6 @@ Putting it All Together
 System View
 ============
 
-**(Browsable) LC$U-DQ-3DR-I2-ET-CQRS+ES-UHE**
 
 Universal Hypermedia Events
 ---------------------------
@@ -411,25 +471,28 @@ A Hyperobject's subscription to itself, used to update QUERY nodes.
 - Logical: potentially implemented by e.g. gossip protocol; the salient feature
   is that it is downstream from the event store
 
-Discussion
-==========
+Elaborations; Related and Future Work
+=====================================
 
 Common Concerns
 --------------
 
 ### DRY
 
-Individual services re-inventing the wheel: "Speed of execution" justifies (Vogels)
+Individual services re-inventing the wheel: "speed of execution" justifies this
+empirically, according to Vogels.
 
-"Premature abstraction is more expensive than nominal repetition"
+[Premature generalization is evil](http://c2.com/cgi/wiki?PrematureGeneralizationIsEvil).
 
-### Premature Complexity
+> Duplication is far cheaper than the wrong abstraction. - [Sandi Metz](http://www.sandimetz.com/blog/2016/1/20/the-wrong-abstraction)
+
+### Premature Complexity (YAGNI)
 
 Monolith can be designed for service-orientation from the beginning. In a
-well-factored monolith, each bounded context should correspond to a RDBMS schema
-that serves both as a logical and security boundary. The event log acts as a
-global blackboard for each bounded context. Within a bounded context, normal
-transactional locking is used to ensure consistency.
+well-factored traditional monolith, each bounded context should correspond to a
+RDBMS schema that serves both as a logical and security boundary. The event log
+acts as a global blackboard for each bounded context. Within a bounded context,
+normal transactional locking is used to ensure consistency.
 
 ### Legacy Services and/or Monolithic Systems
 
@@ -440,6 +503,12 @@ replicates those events to the universal backplane. Care must be taken to
 preserve event semantics and not introduce asynchronous RPC. Factoring out
 concerns that are not domain-specific (e.g. email) is a great place to start.
 
+Microservices
+-------------
+
+Unikernels + Hyperobjects: Real Computers all the Way Down
+----------------------------------------------------------
+
 <a name="appendixA">Appendix A<a>: Principles of Distributed Computing
 ===============================================
 
@@ -447,7 +516,7 @@ The following is abridged from a [talk given by Vogels in 2009](http://www.web2e
 
 Autonomy: Individual components make decisions on local information  
 Asynchrony: Make progress under all circumstances (+ Back Pressure ?)  
-Controlled Concurrency: operations are design such that limited or no concurrency control is required  
+Controlled Concurrency: operations are designed such that limited or no concurrency control is required  
 Controlled Parallelism: use fully decentralized (p2p) techniques to remove bottlenecks  
 Decentralize: remove dependencies  
 Decompose:  
