@@ -30,7 +30,7 @@ section there is some discussion of Hyperobjects vis-à-vis microservices.
 > spoiled for us, for we are usually not the first. What does discovery mean,
 > and who can say that he has discovered this or that? After all it's pure
 > idiocy to brag about priority; for it's simply unconscious conceit, not to
-> admit frankly that one is a plagiarist. - Johann Wofgang von Goethe
+> admit frankly that one is a plagiarist. - Johann Wolfgang von Goethe
 
 While I've made an express attempt to acknowledge primary sources where
 appropriate, I feel compelled to specifically acknowledge a few people whose
@@ -70,7 +70,8 @@ cloud architectures. The primary constraints of this style are:
 * Interactive Intent (I2): Aggregates implement uniform messaging semantics,
   namely Intents, for on-line (interactive) commands
 * Event Time (ET): All Aggregate Roots provide uniform Event Time semantics
-  for all Events and Representations
+  for all Events and Representations, entailing time as a first-class property
+  of all service interactions
 * Dynamic Query (DQ): Services must implement a uniform dynamic query interface
 * Layered + Cient-cache + Uniform Interface per Fielding
 * Browsable API: Services _should_ provide a browser-based interface to
@@ -143,7 +144,7 @@ simple and correct approach the easiest to adopt.
 
 
 > A distributed system is one in which the failure of a computer you didn't even
-> know existed can render your own computer unusable. - Leslie Lamport
+> know existed can render your own computer unusable. - [Leslie Lamport](http://research.microsoft.com/en-us/um/people/lamport/pubs/distributed-system.txt)
 
 [Joe Armstrong offers this syllogism](https://www.infoq.com/presentations/self-heal-scalable-system):
 > Fault tolerance implies scalability
@@ -229,18 +230,54 @@ interface of services.
 
 ### Dynamic Query
 
+Clients should be able to specify their own queries rather than being saddled
+with the singular representation format of the resources owned by a Hyperobject.
+Hyperobjects must implement a Query interface that allows clients to specify
+these in a request-response or persistent connection. For example, Hyperobjects
+in your enterprise may implement an interface that accepts OData or Falcor or
+Relay (or all three) queries, and they could also allow these over a websocket,
+allowing for streaming updates to the client.
+
 ### Universal Hypermedia Events
+
+All Hyperobjects emit an event stream to a universal backplane and subscribe to
+events on the same. Hypermedia events typically do not contain any data other
+than the URL of the Aggregate Root that originated the event and the URN of the
+event type itself. Concordantly, subscribers to that URN generally dereference
+the URL in order to act upon the event. This dynamic prevents eventing from
+degenerating into RPC, allows services to maintain precisely one interface for
+data access, and allows the event consumer an opportunity to act upon the exact
+state of the resource at processing time rather than at event time.
 
 ### Uniform Interface
 
+For various reasons a company might choose polyglot SOA as an enterprise
+strategy, but the Uniform Interface constraint of Hyperobjects requires that
+each of these services meet the Interactive Intents, Dynamic Query, Universal
+Hypermedia Events, and Event-Time constraints. These constraints collectively
+entail specific interaction and metdata semantics described later.
 
 ### Browsable APIs: Interactive Documentation
-* Amundsen
+
+Hyperobjects should provide a developer UI that serves to both document the
+service as well as providing a playground/sandbox for the developer to
+experiment within.
+
+TODO
+* Amundsen?
 * Vs Swagger UI
 * Datomic
 
 
-### REST
+### Whence REST?
+
+Hyperobjects strengthens and enriches some constraints of REST, relaxes
+others, and adds new ones. It attempts to synthesize architectural constraints
+entailed by practicing Domain Driven Design, CQRS, and Event Sourcing, as well
+as codifying the principles of distributed computing. One specific relaxation I
+would call out is the stateless server constraint. Depending on the
+concrete implementation, it may be the case that an Aggregate Root remains
+pinned to a particular server in the cluster.
 
 Service View
 ============
