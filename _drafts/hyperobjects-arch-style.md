@@ -1,5 +1,6 @@
 
-# Hyperobjects: An Architectural Style for the Event-Driven Enterprise
+Hyperobjects: An Architectural Style for the Event-Driven Enterprise
+====================================================================
 
 _Preface_: To the extent possible, I've tried to write this up without
 introducing any new terminology or concepts to the professional vernacular. So,
@@ -11,11 +12,10 @@ assuming the use of HTTP and JSON over TCP/IP networks.
 
 Earlier versions of this document used the term microservices quite liberally.
 I've eschewed that usage because I do not believe there is sufficient agreement
-on what the terms means for it to be useful here. That being said, there is some
-discussion of Hyperobjects vis-a-vis microservices.
+on what the term means for it to be useful here. However, in the final major
+section there is some discussion of Hyperobjects vis-à-vis microservices.
 
-Acknowledgements
-================
+### Acknowledgements
 
 > No one can take from us the joy of the first becoming of aware of something,
 > the so-called discovery. But if we also demand the honor, it can be utterly
@@ -78,7 +78,7 @@ of component services within the enterprise architecture. The design space
 inhabited by this style, distributed enterprise systems, necessarily constrains
 both the services and environment in which services interrelate.
 
-## Contents
+### Contents
 
 0. Motivation
 1. Defining the Constraints of the Hyperobjects Style 
@@ -87,7 +87,7 @@ both the services and environment in which services interrelate.
 4. Elaborations; Related and Future Work
 
 Motivation
-----------
+==========
 
 There are four main themes to the concerns Hyperobjects aims to address:
 
@@ -127,9 +127,12 @@ Rich Hickey emphasized the dangers of conflating simplicity and ease. Others
 have employed the term "pit of success" to describe the intention of making the
 simple and correct approach the easiest to adopt.
 
-### Scalability and Reliability Reliability
+### Scalability and Reliability
 
 >["Non-functional requirements are those that, if not met, will make your system non-functional." - Andrew Clay Shafer](https://twitter.com/M_r_a_x/status/725695757999833090)
+
+> A distributed system is one in which the failure of a computer you didn't even
+> know existed can render your own computer unusable. - Leslie Lamport
 
 [Joe Armstrong offers this syllogism](https://www.infoq.com/presentations/self-heal-scalable-system):
 > Fault tolerance implies scalability
@@ -137,14 +140,12 @@ simple and correct approach the easiest to adopt.
 > * If the components are isolated they can be run in parallel
 > * Things that are isolated and can be run in parallel are scalable
 
-As Werner Vogels espoused, services should make progress under all
-circumstances. We must build our services to work asynchronously, independently,
-and we will get scalability as a consequence of this fault tolerance.
+As Werner Vogels [has long espoused](#appendixA), services should make progress
+under all circumstances. We must build our services to work asynchronously,
+independently, and we will get scalability as a consequence of this fault
+tolerance.
 
 ### Correctness and Time
-
-> A distributed system is one in which the failure of a computer you didn't even
-> know existed can render your own computer unusable. - Leslie Lamport
 
 In recent years functional programming has made huge in-roads into mainstream
 software development practice. Concomitantly, ideas from FP like immutability
@@ -162,7 +163,7 @@ time are hard; we want to make them easy by simplifying and rigorously
 controlling how they are handled.
 
 Service View
-==========================
+============
 
 The primary building block of the Hyperobjects style are Hyperobjects
 themselves. These are autonomous services that own a well-defined area of
@@ -324,14 +325,21 @@ Event-Time (versus Processing Time) for every Entity within the Aggregate Root.
 
 In Hyperobjects, there is no global time, and processing time--aka wall-clock
 time--is only interesting insofar as it is leveraged by Event Processors to
-create partially-ordered event sets (see posets in Luckham) and
+create e.g. partially-ordered event sets (see posets in Luckham) or
 [windows](https://www.oreilly.com/ideas/the-world-beyond-batch-streaming-101).
 
 ### Revisions
 
 Thus, every 200-level (successful) response contains a Representation
 of a particular *Revision* of an Aggregate Root. Both that revision and the
-Event that engendered it can be identified by the Event-Time.
+Event that engendered it can be identified by the Event-Time. Since history is
+immutable, the Revision can be permanently cached.
+
+### Dynamic Query
+
+* QUERY verb
+* Query preprocessor
+* Subscriptions
 
 Putting it All Together
 -----------------------
@@ -343,11 +351,15 @@ Putting it All Together
 ### Application Gateways
 
 
-System-level
+System View
 ============
 
-Universal Backplane
--------------------
+**(Browsable) LC$U-DQ-3DR-I2-LT-CQRS+ES-UHE**
+
+Universal Hypermedia Events
+---------------------------
+
+### Universal Backplane
 
 As distinct from an Enterprise Service Bus:
 
@@ -425,7 +437,7 @@ replicates those events to the universal backplane. Care must be taken to
 preserve event semantics and not introduce asynchronous RPC. Factoring out
 concerns that are not domain-specific (e.g. email) is a great place to start.
 
-Appendix A: Principles of Distributed Computing
+<a name="appendixA">Appendix A<a>: Principles of Distributed Computing
 ===============================================
 
 Abridged from a [talk given by Vogels in 2009](http://www.web2expo.com/webexsf2009/public/schedule/detail/8539)
