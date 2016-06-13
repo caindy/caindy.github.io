@@ -4,11 +4,12 @@ Hyperobjects: An Architectural Style for the Event-Driven Enterprise
 
 _Preface_: To the extent possible, I've tried to write this up without
 introducing any new terminology or concepts to the professional vernacular. So,
-I've assumed familiarity with the concepts detailed in *Domain Driven Design* [DDD],
-"Architectural Styles and the Design of Network-based Software Architectures"
-[Fielding], as well as Command Query Responsibility Segregation and Event
-Sourcing. For the sake of clarity, this document discusses things concretely,
-assuming the use of HTTP and JSON over TCP/IP networks.
+I've assumed familiarity with the concepts detailed in *Domain Driven Design*
+[DDD], "Architectural Styles and the Design of Network-based Software
+Architectures" [Fielding], *Enterprise Integration Patterns* [Hohpe], as well as
+Command Query Responsibility Segregation and Event Sourcing. For the sake of
+clarity, this document discusses things concretely, assuming the use of HTTP and
+JSON over TCP/IP networks.
 
 Earlier versions of this document used the term microservices quite liberally.
 I've eschewed that usage because I do not believe there is sufficient agreement
@@ -27,7 +28,7 @@ section there is some discussion of Hyperobjects vis-à-vis microservices.
 While I've made an express attempt to acknowledge primary sources where
 appropriate, I feel compelled to specifically acknowledge a few people whose
 writings and presentations have been my primary influences in developing this
-architectural style. So many thanks to Dr. Alan Kay, Dr. Werner Vogels, Eric
+architectural style. Many thanks to Dr. Alan Kay, Dr. Werner Vogels, Eric
 Evans, Dr. Joe Armstrong, Dr. Roy Fielding, Udi Dahan, Dr. Jim Webber, Rich
 Hickey, David Nolen, and Dr. David Luckham.
 
@@ -60,8 +61,8 @@ cloud architectures. The primary constraints of this style are:
 * Domain Driven Design Resources (3DR): Services define a Bounded Context /
   Aggregate Roots are REST Resources
 * Interactive Intent (I2): Aggregates implement uniform messaging semantics,
-  Intents, for on-line (interactive) commands
-* Logical Time (LT): All Aggregate Roots provide uniform Logical Time semantics
+  namely Intents, for on-line (interactive) commands
+* Event Time (ET): All Aggregate Roots provide uniform Event Time semantics
   for all Events and Representations
 * Dynamic Query (DQ): Services must implement a uniform dynamic query interface
 * Layered + Cient-cache + Uniform Interface per Fielding
@@ -69,7 +70,7 @@ cloud architectures. The primary constraints of this style are:
   interactive documentation
 
 _(If you are very familiar with Fielding, my feeble attempt at emulating
-his concision: **(Browsable) LC$U-DQ-3DR-I2-LT-CQRS+ES-UHE**)_
+his concision: **(Browsable) LC$U-DQ-3DR-I2-ET-CQRS+ES-UHE**)_
 
 The style is described at two levels: the System-level and the
 Service-level. The System-level describes the style as an enterprise
@@ -130,7 +131,8 @@ simple and correct approach the easiest to adopt.
 
 ### Scalability and Reliability
 
->["Non-functional requirements are those that, if not met, will make your system non-functional." - Andrew Clay Shafer](https://twitter.com/M_r_a_x/status/725695757999833090)
+> Non-functional requirements are those that, if not met, will make your system
+> non-functional. - [Andrew Clay Shafer](https://twitter.com/M_r_a_x/status/725695757999833090)
 
 
 > A distributed system is one in which the failure of a computer you didn't even
@@ -198,7 +200,7 @@ Or,
 Clients get work done by sending Command Messages to Services. These are called
 Intents to reflect both their provisional nature and their role in the service
 design--capturing the intention of the user or system-actor. In practice,
-modeling intent messages is a powerful tool for knowledge crunching (DDD).
+Intent modeling is a powerful tool for knowledge crunching (DDD).
 
 Intents are part of the Uniform Interface for Hyperobjects; they define the
 following standard envelope format for all Command Messages sent to the
@@ -352,11 +354,10 @@ Putting it All Together
 
 ### Application Gateways
 
-
 System View
 ============
 
-**(Browsable) LC$U-DQ-3DR-I2-LT-CQRS+ES-UHE**
+**(Browsable) LC$U-DQ-3DR-I2-ET-CQRS+ES-UHE**
 
 Universal Hypermedia Events
 ---------------------------
@@ -442,7 +443,7 @@ concerns that are not domain-specific (e.g. email) is a great place to start.
 <a name="appendixA">Appendix A<a>: Principles of Distributed Computing
 ===============================================
 
-Abridged from a [talk given by Vogels in 2009](http://www.web2expo.com/webexsf2009/public/schedule/detail/8539)
+The following is abridged from a [talk given by Vogels in 2009](http://www.web2expo.com/webexsf2009/public/schedule/detail/8539).
 
 Autonomy: Individual components make decisions on local information  
 Asynchrony: Make progress under all circumstances (+ Back Pressure ?)  
@@ -478,13 +479,8 @@ You can GET a previous version by
 These are always returned with an Expires header of one year hence, indicating
 it should *never* expire, per [RFC 2616, Sec. 14.21](http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.21)
 
-You can think of the following as being equivalent identifiers.
-
-> http://bounded-context/logical-aggregate/aggregate-root-entity-id/latest
+Sending Intents to the Continuant URL (below) is implicitly sending it to the current Revision.
 > http://bounded-context/logical-aggregate/aggregate-root-entity-id/
-
-In other words sending Intents to the latter is implicitly sending it to the
-latest revision.
 
 The first Revision is 0. To create an Aggregate Root, simply POST a create
 Intent to the Logical Aggregate. This first Revision of an Aggregate Root will
@@ -601,10 +597,21 @@ You can also POST/POSIT a multiplexed Intent, i.e. a message that contains ortho
 Aggregate Root/Revision.
 `413 Request Entity Too Large` if [DynamoDb limits](http://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_BatchWriteItem.html)
 
+Novel Capabilities
+------------------
+
+Incorporating event time semantics for all observable values and behaviors
+enables some novel capabilties:
+
+* point-in-time distributed consistency
+* entity timeline inspection
+* forking an entity from a previous point-in-time
+* safe "what-if" operations
+
 ### Batch
 ### Use Cases
-#### POSIT alternative futures
-#### POSIT alternate FORK
+#### POSITing alternative futures: Safe "what-if" operations 
+#### POSITing alternative pasts
 
 Implementation Dependencies
 ---------------------------
@@ -676,17 +683,26 @@ the backing store becomes unavailable, reads will not be possible.
 
 Choosing DynamoDb as a backing store has a number of benefits and tradeoffs.
 
-No Transactor
--------------
+No Transactor / Overall Availability vs Local Availability
+----------------------------------------------------------
 Unlike Datomic, there is no central transactor component, i.e. there is no
 coordination of reads or writes among the various servers hosting the
 Hyperobject. This is possible because the consistent hashing router, and we
-accept that a subset of aggregates will be unavailable if a node goes down. As
-Joe Armstrong says, availability and horizontal scalability are the same thing.
+accept that a subset of aggregates will be unavailable if a node goes down.
 
+TODO:
+=====
 
-Deletions
----------
+* Remove implemenation details that are specific to the F# implementation
+* Actors vs Hyperobjects
+* Microservices vs Hyperobjects
+* Emphasize efficacy of features along thematic lines
+* Message Flow animation to describe enterprise communication patterns
+* Exposition of universal backplane implemenation
+
+Removed from this Documentation
+-------------------------------
+
 These constraints are combined with others selected from Domain-Driven Design,
 Vogel's Principles of Distributed Computing, Enterprise Integration Patterns,
 message-oriented programming, Representational State Transfer, event sourcing,
@@ -697,13 +713,7 @@ is very high and unambiguous.
 
 * All Command operations are modeled as Intent messages that are POSTed and
     can be batched atomically, allowing clients to synthesize new operations
-  * Incorporate logical time semantics for all observable values and
-    behaviors enabling:
-    * point-in-time distributed consistency
-    * entity timeline inspection
-    * forking an entity from a previous point-in-time
-    * safe "what-if" operations
-
+  * 
 Implementation details are described in terms of common web technologies (JSON,
 HTTP, etc.); the reader is encouraged to generalize. A running example of a
 retail enterprise is used to frame the narrative. The System-level architecture
