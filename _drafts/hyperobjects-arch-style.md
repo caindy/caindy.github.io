@@ -85,7 +85,7 @@ Service-level. The System-level describes the style as an enterprise
 architecture, whereas the Service-level describes the constraints and behaviors
 of component services within the enterprise architecture. The design space
 inhabited by this style, distributed enterprise systems, necessarily constrains
-both the services and environment in which services interrelate.
+both the services and medium by which services interrelate.
 
 ### Contents
 
@@ -98,7 +98,7 @@ both the services and environment in which services interrelate.
 Motivation
 ==========
 
-There are four main themes to the concerns Hyperobjects aims to address:
+There are five main themes to the concerns Hyperobjects aims to address:
 
 * fostering serendipity
 * simplicity and ease of implementation
@@ -106,7 +106,7 @@ There are four main themes to the concerns Hyperobjects aims to address:
 * correctness and time
 * fractal design
 
-### Foster Serendipity
+### Fostering Serendipity
 
 Eric Evans calls it supple design; the idea is that our architecture should
 foster an environment where new requirements are easy to satisfy in a simple
@@ -163,7 +163,7 @@ tolerance.
 In recent years functional programming has made huge in-roads into mainstream
 software development practice. Concomitantly, ideas from FP like immutability
 have found their way into traditional enterprise OOP. Reactive Programming is
-driving many of the innovations in front-end development, and CRDTs are seeing
+driving being adopted at all levels of the stack, and CRDTs are seeing
 broader adoption. Finally, testing techniques and tools abound alongside
 academic innovations in theorem proving, property-based testing, concolic
 testing, and other automated analysis techniques.
@@ -189,7 +189,7 @@ proven the effectiveness SOA as an organizing principle and latter day so-called
 microservices practitioners are ostensibly exploring the limits of this
 approach.
 
-At the micro-level, principles like layering, acting on local knowledge, and
+At the micro level, principles like layering, least knowledge, and
 encapsulation shape our concrete implementations of everything from UIs to data stores.
 
 With Hyperobjects we try to define an architectural style that can serve as an
