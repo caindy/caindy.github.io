@@ -67,8 +67,8 @@ cloud architectures. The primary constraints of this style are:
 * CQRS+ES: Command Query Responsibility Segregation + Event Sourcing
 * Domain Driven Design Resources (3DR): Services define a Bounded Context /
   Aggregate Roots are REST Resources
-* Interactive Intent (I2): Aggregates implement uniform messaging semantics,
-  namely Intents, for on-line (interactive) commands
+* Interactive Intent (I2): Aggregates implement uniform composable messaging
+  semantics, namely Intents, for on-line (interactive) commands
 * Event Time (ET): All Aggregate Roots provide uniform Event Time semantics
   for all Events and Representations, entailing time as a first-class property
   of all service interactions
@@ -183,7 +183,7 @@ Defining the Constraints of the Hyperobjects Style
 ### Domain Driven Design Resources
 
 Services in Hyperobjects implement a single Bounded Context, and expose it via
-RESTful interface.
+REST-like interface.
 
 -------------------------------------------------------------------------
 | DDD Concept                      | REST Concept                       |
@@ -210,7 +210,7 @@ all communications.
 
 By constraining all service interactions to have explicit, regular spacetime
 semantics, we can ameliorate an entire class of bugs related to causality,
-improve the debuggability of our systems, and introduce novel capabilties such as:
+improve the debuggability of our systems, and introduce capabilties such as:
 
 * point-in-time distributed consistency
 * entity timeline inspection
@@ -219,14 +219,28 @@ improve the debuggability of our systems, and introduce novel capabilties such a
 
 ### Interactive Intents
 
-Clients get work done by sending Command Messages to Services. These are called
+Clients get work done by sending Command Messages to services. These are called
 Intents to reflect both their provisional nature and their role in the service
 design--capturing the intention of the user or system-actor. In practice,
-Intent modeling is a powerful tool for knowledge crunching (DDD).
+Intent modeling is a powerful tool for knowledge crunching.
 
 Intents are part of the Uniform Interface for Hyperobjects; they define a
 standard envelope format for all Command Messages sent to the interactive
 interface of services.
+
+A key aspect of this constraint is composability. Well-defined rules establish
+means for clients to compose various Intents into an atomic command. There are
+two kinds of composition defined: linear and parallel.
+
+In linear composition individual Intents are processed against the same target.
+The constituent Intents are processed sequentially in event-time. So the result
+of processing a linear composition is to move the timeline forward for the
+target. In parallel composition individual Intents or linear compositions are
+processed independently, resulting in separate timelines.
+
+The mechanics of Intent composition will be discussed at length in later
+sections, but the salient point is that it **allows clients to synthesize new
+capability from existing commands without making changes to the service**.
 
 ### Dynamic Query
 
@@ -301,38 +315,80 @@ connects to the universal backplane for hypermedia events.
 
 ![Hyperobject sketch](./images/Hyperobject.png)
 
-### Interactive Inteface
+### Interactive Interface
 
-The Command side of the Interactive Interface is shaped by CQRS, 3DR, and I2.
+The Interactive Interface of a Hyperobject is an online transaction processing
+interface. As such is must obey certain principles of distributed systems. In
+particular, all operations (commands or queries) must act only on local
+knowledge. Other principles are described in [Appendix A](#appendixA), but the
+local knowledge constraint has several important implications. First, it implies
+that each Hyperobject has a private local repository of knowledge about itself
+and information replicated from other sources of knowledge; it has a copy of all
+the data it needs to work. This local knowledge is kept updated via the Reactive
+Interface described later.
+
+The Interactive Interface is segregated into to an Intent (command) surface and a
+Query surface. Access to these surfaces is mitigated by URL and Verb.
+
+#### URLs
 
 ```
 https://consumer-shopping-context.contoso.com/consumer-shopping-cart/42924579adkfajl32792i98f98
         \--------- bounded context ---------/\---- aggregate ------/\--- aggregate root id ---/
 ```
-All Hyperobjects URLs are translucent identifiers with regular structure that delineate
+All Hyperobjects URLs are translucent identifiers with a regular structure that delineates
 constituent API surfaces. There are four primary URL types.
 
 - Bounded Context  
   //**consumer-shopping-context.contoso.com**/  
-  Exposes service metadata (available Intents, Event Activities)  
+  Exposes service metadata (available Intents, emitted Events)  
   Also serves as entry-point for browsable interactive documentation  
+  Supports: GET, QUERY
   
 - Aggregate  
-  //consumer-shopping-context.contoso.com/**consumer-shopping-cart**/  
-  Exposes Query surface for a Resource Type e.g. Shopping Carts  
+  //consumer-shopping-context.contoso.com/**cart**/  
+  Exposes Query surface for a Resource Type e.g. Carts  
   Admits creation of new aggregate roots  
+  Supports: GET (metdata), QUERY, POST, POSIT
 
 - Continuant  
-  //consumer-shopping-context.contoso.com/consumer-shopping-cart/**42924579adkfajl32792i98f98**  
-  Nominates the "current" version of a particular Aggregate Root  
+  //consumer-shopping-context.contoso.com/cart/**4b9z479akfj8**  
+  The stable identity of an Aggregate Root as it changes over time,
+  i.e. nominates the "current version" of a particular Aggregate Root  
   Primary API surface, implements domain operations (i.e. POSTed Intents)  
+  Supports: GET, POST, DELETE
 
 - Revision  
-  //consumer-shopping-context.contoso.com/consumer-shopping-cart/42924579adkfajl32792i98f98/**101**  
+  //consumer-shopping-context.contoso.com/cart/4b9z479akfj8/**101**  
   Nominates an Aggregate Root at a particular point-in-event-time, e.g. 101  
   Generally exposes the same operational semantics as the Continuant, but
-  results in a new Aggregate Root, a fork of the original at the point-in-event-time
-  nominated by the Revision
+  results in a new Aggregate Root, a fork of the original at the
+  point-in-event-time nominated by the Revision  
+  Supports: GET, POST, POSIT
+
+- History  
+  //consumer-shopping-context.contoso.com/cart/4b9z479akfj8/**history**  
+  An event-time ordered, paged listing of the events that have transpired for a
+  particular Aggregate Root  
+  Supports: GET
+
+#### Supported Verbs
+
+> The most important thing about object-oriented thinking is getting the verbs
+> right. - attributed to Alan Kay in "Points of View", pg 113
+
+From HTTP we take GET, POST and DELETE, to which we add POSIT and QUERY.
+
+POSIT adopts the application-level semantics of an equivalent POST but removes
+any durable change. In other words, it functions exactly as if you had performed
+a POST, but there is no change of state in the service. Thus, unlike POST, POSIT
+is safe and idempotent. The primary use of this verb is to allow clients to peek
+into the future, asking "what if" questions. The body of any POST or POSIT must
+always be an Intent supported by the Aggregate.
+
+QUERY adopts the semantics of GET; it is safe and idempotent. However, it allows
+for a body in the request, the query itself, with the query langage nominated by
+the Content-Type header.
 
 #### Revisions
 
@@ -341,15 +397,15 @@ of a particular *Revision* of an Aggregate Root. Both that revision and the
 Event that engendered it can be identified by the Event-Time. Since history is
 immutable, the Revision can be permanently cached by clients.
 
-### Intent Messages
+### Intents
 
 - Activity Name: names the Intent, nominating the semantics for the Data property
 - Id: correlation identifier returned in the Resource Representation, opaque to service
 - Data: a JSON object representing the Command Message 
 
 ```
-POST /consumer-shopping-cart/42924579adkfajl32792i98f98
-{ "activity" : "urn:com:constoso:consumer-shopping:bundle:add-item",
+POST /cart/4b9z479akfj8
+{ "activity" : "urn:com:constoso:shopping:bundle:add-item",
   "id" : "asi292kajfl",
   "data" : {
     "item-id" : "ASD2AK",
@@ -373,10 +429,16 @@ Or,
 
 ### Dynamic Query
 
-* QUERY verb
-* Query preprocessor
-* Subscriptions
+Dynamic Query is a key constraint of this architectural style, but the exact
+implementation described here is intended to be suggestive rather than
+prescriptive. The salient point is that a client can define a particular view
+over the data owned by a Hyperobject in a language that is uniformly supported
+in the enterprise (e.g. SQL, EDN, GraphQL, etc.).
 
+Additionally, this query should be supported as a transient subscription. For
+example, a websocket connection, server sent events, Comet-style connections are
+all channels that could keep a client updated as the results of a query are
+updated.
 
 ### Events
 
@@ -446,11 +508,11 @@ may be satisfied by many backends.
 Putting it All Together
 -----------------------
 
-### Typical Request Process Illustrated
-
-### Interactive Documentation
-
 ### Application Gateways
+
+The layered architecture of the style invites aggregation of individual Hyperobjects.
+
+### Typical Request Process Illustrated
 
 System View
 ============
@@ -687,6 +749,11 @@ nothing is durably changed. In other words, POSIT skips the `store` step.
 - archive&ast;
 
 ### QUERY
+
+* QUERY verb
+* Query preprocessor
+* Subscriptions
+
 #### Steps
 - parse
 - authorize
