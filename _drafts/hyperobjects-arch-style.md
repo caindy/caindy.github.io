@@ -73,7 +73,7 @@ cloud architectures. The primary constraints of this style are:
   for all Events and Representations, entailing time as a first-class property
   of all service interactions
 * Dynamic Query (DQ): Services must implement a uniform dynamic query interface
-* Layered + Cient-cache + Uniform Interface per Fielding
+* Layered + Cient-cache + Uniform Interface + Hypermedia constraint (Fielding)
 * Browsable API: Services _should_ provide a browser-based interface to
   interactive documentation
 
@@ -508,10 +508,6 @@ may be satisfied by many backends.
 Putting it All Together
 -----------------------
 
-### Application Gateways
-
-The layered architecture of the style invites aggregation of individual Hyperobjects.
-
 ### Typical Request Process Illustrated
 
 System View
@@ -569,6 +565,26 @@ A Hyperobject's subscription to itself, used to update QUERY nodes.
 - Makes progress even while Circuit Breaker is tripped
 - Logical: potentially implemented by e.g. gossip protocol; the salient feature
   is that it is downstream from the event store
+
+
+### Application Gateways
+
+The layered architecture of the style invites aggregation of individual
+Hyperobjects. Hyperobjects are intended to support an evolutionary approach,
+allowing clients to them directly at first then to factor common access patterns
+or cross-service composite abstractions into a service of its own. These
+aggregation services are known alternately as experience-based APIs, frontend
+servers, service aggregators, application gateways, view-model servers, etc.
+These services are themselves clients of the Hyperobjects layer and are not
+constrained as such; they do play a key role in the Hyperobjects style as
+briefly described thus far.
+
+These services do not own any domain-specific data. They do not participate in
+the universal hypermedia events backplane. They logically belong to a particular
+client application and likely share code with the same. Their role is to provide
+agility at the application layer, allowing client-specific abstractions to
+evolve independently of the domain abstractions and for application logic to
+span bounded contexts. 
 
 Elaborations; Related and Future Work
 =====================================
