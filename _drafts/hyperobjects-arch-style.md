@@ -409,9 +409,9 @@ is safe and idempotent. The primary use of this verb is to allow clients to peek
 into the future, asking "what if" questions. The body of any POST or POSIT must
 always be an Intent supported by the Aggregate.
 
-QUERY adopts the semantics of GET; it is safe and idempotent. However, it allows
-for a body in the request, the query itself, with the query langage nominated by
-the Content-Type header.
+QUERY adopts the semantics of GET; it is safe and idempotent, unlike POST.
+However, like POST, it allows for a body in the request, the query itself, where
+the query langage nominated by the Content-Type header.
 
 ### Revisions
 
@@ -533,7 +533,21 @@ Reactive Interface
 
 ### Event Emission
 
-### Local Knowledge Graph Updates
+Events are replicated to the universal backplane from the event store. Events
+are also delivery to the Hyperobject's Event Processor via a "loopback" channel
+that works independently of the backplane.
+
+### Event Processor
+
+The Event Processor receives events from the backplane and the loopback,
+performs the requisite fetches and other transformation, then updates the local
+knowledge graph.
+
+### Local Knowledge Graph
+
+All interactive operations are satisfied via local knowledge, but that knowledge
+is updated via these reactive mechanisms.
+
 
 System View
 ============
