@@ -398,7 +398,7 @@ constituent API surfaces. There are four primary URL types.
 ### Supported Verbs
 
 > The most important thing about object-oriented thinking is getting the verbs
-> right. - attributed to Alan Kay in "Points of View", pg 113
+> right. - attributed to Alan Kay in [Points of View](http://vpri.org/pov/), p. 113
 
 From HTTP we take GET, POST and DELETE, to which we add POSIT and QUERY.
 
