@@ -411,7 +411,7 @@ always be an Intent supported by the Aggregate.
 
 QUERY adopts the semantics of GET; it is safe and idempotent, unlike POST.
 However, like POST, it allows for a body in the request, the query itself, where
-the query langage nominated by the Content-Type header.
+the query language is nominated by the Content-Type header.
 
 ### Revisions
 
