@@ -104,6 +104,7 @@ There are four main themes to the concerns Hyperobjects aims to address:
 * simplicity and ease of implementation
 * scalability and reliability
 * correctness and time
+* fractal design
 
 ### Foster Serendipity
 
@@ -174,6 +175,25 @@ a reality of eventual consistency and regular failure. In particular, state and
 time are hard; we want to make them easy by simplifying and rigorously
 controlling how they are handled.
 
+### Fractal Design
+
+> organizations which design systems ... are constrained to produce designs
+> which are copies of the communication structures of these organizations
+> - Conway's Law
+
+The design of software systems appears fractal. At the macro level, we talk
+about Agile organizations for express purpose of enabling agility in our
+projects. We want to make incremental progress on all fronts, an aim that is
+stymied by traditional command and control organization. Amazon and Netflix have
+proven the effectiveness SOA as an organizing principle and latter day so-called
+microservices practitioners are ostensibly exploring the limits of this
+approach.
+
+At the micro-level, principles like layering, acting on local knowledge, and
+encapsulation shape our concrete implementations of everything from UIs to data stores.
+
+With Hyperobjects we try to define an architectural style that can serve as an
+organizing principle for the enterprise.
 
 Defining the Constraints of the Hyperobjects Style 
 ==================================================
@@ -275,23 +295,28 @@ entail specific interaction and metdata semantics described later.
 
 Hyperobjects should provide a developer UI that serves to both document the
 service as well as providing a playground/sandbox for the developer to
-experiment within.
+experiment within. In practice this provides an excellent test harness and early
+consumer for our service's API, as well as ensuring the REST Hypermedia
+constraint (sometimes called HATEOAS) is met.
 
-TODO
-* Amundsen?
-* Vs Swagger UI
-* Datomic
+Early releases of Datomic provided this kind of experience. To my knowledge this
+has been supplanted by a rich application, Datomic Console. Swagger UI is an
+example of interactive documentation, but doesn't really allow for browsing.
 
+The interactive documentation of a Hyperobject is essentially a very simple
+classic web application that exercises the entire API in a sandboxed
+environment, providing documentation inline with the display of the sandboxed
+resources.
 
-### Whence REST?
+### REST?
 
 Hyperobjects strengthens and enriches some constraints of REST, relaxes
 others, and adds new ones. It attempts to synthesize architectural constraints
 entailed by practicing Domain Driven Design, CQRS, and Event Sourcing, as well
 as codifying the principles of distributed computing. One specific relaxation I
-would call out is the stateless server constraint. Depending on the
+would call out is the stateless server constraint. For example, depending on the
 concrete implementation, it may be the case that an Aggregate Root remains
-pinned to a particular server in the cluster.
+pinned to a particular server in the cluster. 
 
 Service View
 ============
@@ -306,16 +331,14 @@ Servers, Experience-based APIs) as necessary.
 To understand the Service-level architecture, we need to establish some
 terminology.
 
-Hyperobject Concepts
---------------------
-
 Hyperobjects have two primary external interfaces: an Interactive Interface that
 exhibits Command-Query Responsibility Segregation and a Reactive Interface that
 connects to the universal backplane for hypermedia events.
 
 ![Hyperobject sketch](./images/Hyperobject.png)
 
-### Interactive Interface
+Interactive Interface
+---------------------
 
 The Interactive Interface of a Hyperobject is an online transaction processing
 interface. As such is must obey certain principles of distributed systems. In
@@ -330,7 +353,7 @@ Interface described later.
 The Interactive Interface is segregated into to an Intent (command) surface and a
 Query surface. Access to these surfaces is mitigated by URL and Verb.
 
-#### URLs
+### URLs
 
 ```
 https://consumer-shopping-context.contoso.com/consumer-shopping-cart/42924579adkfajl32792i98f98
@@ -372,7 +395,7 @@ constituent API surfaces. There are four primary URL types.
   particular Aggregate Root  
   Supports: GET
 
-#### Supported Verbs
+### Supported Verbs
 
 > The most important thing about object-oriented thinking is getting the verbs
 > right. - attributed to Alan Kay in "Points of View", pg 113
@@ -390,7 +413,7 @@ QUERY adopts the semantics of GET; it is safe and idempotent. However, it allows
 for a body in the request, the query itself, with the query langage nominated by
 the Content-Type header.
 
-#### Revisions
+### Revisions
 
 Thus, every 200-level (successful) response contains a Representation
 of a particular *Revision* of an Aggregate Root. Both that revision and the
@@ -413,6 +436,7 @@ POST /cart/4b9z479akfj8
   }
 }
 ```
+
 #### Activity Name
 
 URNs of the form `urn:tenant:bounded-context:entity:verb`, denoting either an
@@ -425,20 +449,6 @@ Or,
 
 - Intent URN: `urn:com:contoso:consumer-shopping:bundle:add-item`
 - Event URN:  `urn:com:contoso:consumer-shopping:bundle:item-added`
-
-
-### Dynamic Query
-
-Dynamic Query is a key constraint of this architectural style, but the exact
-implementation described here is intended to be suggestive rather than
-prescriptive. The salient point is that a client can define a particular view
-over the data owned by a Hyperobject in a language that is uniformly supported
-in the enterprise (e.g. SQL, EDN, GraphQL, etc.).
-
-Additionally, this query should be supported as a transient subscription. For
-example, a websocket connection, server sent events, Comet-style connections are
-all channels that could keep a client updated as the results of a query are
-updated.
 
 ### Events
 
@@ -468,6 +478,7 @@ time when an event was received--is only interesting insofar as it is leveraged
 by Event Processors to create partially-ordered sets of events (see posets in
 Luckham) or [windowing](https://www.oreilly.com/ideas/the-world-beyond-batch-streaming-101).
 
+#### Request Processing
 
 To understand the relationship between Intents, Events, and the HTTP
 request/response, it's easiest to look at the request processing pipeline of a
@@ -487,7 +498,6 @@ request. A further caveat: this presentation of the Hyperobject pipeline is a
 slightly simplified version of how a POSTed Intent is handled within an
 Aggregate Root.
 
-
 #### Event Store Geoplex
 
 Until an event is written here, it didn't happen.
@@ -500,15 +510,30 @@ is to ensure that data is committed atomically to disparate geographic
 locations.
 
 The geoplexing requirement might be relaxed for deployments that have weaker
-disaster recovery guarantees, and we will discuss other requirements for a
-Hyperobjects event store. Other presentations may refer to this store as a
-replicated event log, but I wish to emphasize that the requirements of the store
-may be satisfied by many backends.
+disaster recovery guarantees, and we I discuss additional requirements for a
+Hyperobjects event store in Appendix B. Other presentations may refer to this
+store as a replicated event log, but I wish to emphasize that the requirements
+of the store may be satisfied by many backends.
 
-Putting it All Together
------------------------
+### Dynamic Query
 
-### Typical Request Process Illustrated
+Dynamic Query is a key constraint of this architectural style, but the exact
+implementation described here is intended to be suggestive rather than
+prescriptive. The salient point is that a client can define a particular view
+over the data owned by a Hyperobject in a language that is uniformly supported
+in the enterprise (e.g. SQL, EDN, GraphQL, etc.).
+
+Additionally, this query should be supported as a transient subscription. For
+example, a websocket connection, server sent events, Comet-style connections are
+all channels that could keep a client updated as the results of a query are
+updated.
+
+Reactive Interface
+------------------
+
+### Event Emission
+
+### Local Knowledge Graph Updates
 
 System View
 ============
@@ -567,7 +592,8 @@ A Hyperobject's subscription to itself, used to update QUERY nodes.
   is that it is downstream from the event store
 
 
-### Application Gateways
+Application Gateways
+--------------------
 
 The layered architecture of the style invites aggregation of individual
 Hyperobjects. Hyperobjects are intended to support an evolutionary approach,
@@ -778,6 +804,9 @@ nothing is durably changed. In other words, POSIT skips the `store` step.
 
 Multiplexing and Batching
 ----------
+
+TODO: adopt linear and parallel composition terminology
+
 Rather than requiring protocol specific support for pipelining commands, Intents can be sent
 in batches. Of course, these batches can only be addressed to a single URL, thus this "pipelining"
 is constrained to just one resource. Succinctly, you can POST/POSIT an array of Intents to an Aggregate Root/Revision.
