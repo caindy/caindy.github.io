@@ -1,3 +1,11 @@
+---
+layout: post
+title:  "Beauty, Elegance, Simplicity, Ease: Microservices as the Supply Chain"
+date:   2016-06-20
+permalink: supply-chain
+categories: learning editors
+---
+
 ## Beauty, Elegance, Simplicity, Ease: Microservices as the Supply Chain
 
 In the course of writing about Hyperobjects today, I came across this quote from Einstein:
