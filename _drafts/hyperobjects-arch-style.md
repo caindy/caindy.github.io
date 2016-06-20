@@ -105,6 +105,7 @@ There are five main themes to the concerns Hyperobjects aims to address:
 * scalability and reliability
 * correctness and time
 * fractal design
+* cloud
 
 ### Fostering Serendipity
 
@@ -137,6 +138,9 @@ In ["Simple Made Easy"](https://www.infoq.com/presentations/Simple-Made-Easy),
 Rich Hickey emphasized the dangers of conflating simplicity and ease. Others
 have employed the term "pit of success" to describe the intention of making the
 simple and correct approach the easiest to adopt.
+
+A key tenent of the Hyperobjects style is that pushing intelligence to the edges
+increases agility, and thus speed of execution.
 
 ### Scalability and Reliability
 
@@ -190,10 +194,15 @@ microservices practitioners are ostensibly exploring the limits of this
 approach.
 
 At the micro level, principles like layering, least knowledge, and
-encapsulation shape our concrete implementations of everything from UIs to data stores.
+encapsulation shape our concrete implementations of everything from UIs to data
+stores. 
 
 With Hyperobjects we try to define an architectural style that can serve as an
 organizing principle for the enterprise.
+
+### Cloud
+
+
 
 Defining the Constraints of the Hyperobjects Style 
 ==================================================
@@ -556,9 +565,16 @@ System View
 Universal Hypermedia Events
 ---------------------------
 
-### Universal Backplane
+### Universal Backplane for Events
+
+Hypermedia Events are the only messages
 
 As distinct from an Enterprise Service Bus:
+
+Jim Webber: Decentralized Integration https://www.infoq.com/presentations/webber-guerilla-soa
+
+- 
+
 
 - "Distributed, Replicated Messaging"
 - "A high-scale, durable, distributed buffer"
@@ -634,6 +650,9 @@ Common Concerns
 
 ### DRY
 
+In Hyperobjects, each service is responsible for implementing and maintaining
+the appropriate apparatus for dealing with the realities of distributed systems:
+reachability, transient failures, throttling, etc.
 Individual services re-inventing the wheel: "speed of execution" justifies this
 empirically, according to Vogels.
 
@@ -663,6 +682,9 @@ Microservices
 
 Unikernels + Hyperobjects: Real Computers all the Way Down
 ----------------------------------------------------------
+
+Alan Kay has a concept, "real computers all the way down", that I'll discuss in
+the final section that speaks to the aforementioned notion of fractal design.
 
 <a name="appendixA">Appendix A<a>: Principles of Distributed Computing
 ===============================================
