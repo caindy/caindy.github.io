@@ -6,8 +6,6 @@ permalink: supply-chain
 categories: learning editors
 ---
 
-## Beauty, Elegance, Simplicity, Ease: Microservices as the Supply Chain
-
 In the course of writing about Hyperobjects today, I came across this quote from Einstein:
 
 > Our experience hitherto justifies us in trusting that nature is the
@@ -23,9 +21,9 @@ Beauty is a consequence of simplicity; it is the elegance of simplicity that we
 find beautiful. The simple line that evokes a greater whole.
 
 To what extent are we justified in searching for simplification? There is a
-quote often misattributed to Einstein that goes something like, "A solution
-should be as simple as possible but no simpler." Apparently, that is considered
-to be misattributed reduction of this quote:
+quote often misattributed to Einstein that goes something like, "a solution
+should be as simple as possible but no simpler;" this pithy saying is considered
+to be a reduction of this actual quote of Einstein:
 
 > It can scarcely be denied that the supreme goal of all theory is to make the
 > irreducible basic elements as simple and as few as possible without having to
@@ -81,11 +79,11 @@ and therein lies the most pernicious fact of our learning--we must trust.
 Most of what we call learning today is simply imitation. Feynman has a famous
 rant on cargo cult "science", but I think technology is inherently biased
 towards an imitation-first path to mastery. Language is a technology to which we
-have adapted, a reciprocal evolution, but imitation remains the primary means of
-acquisition.
+have apparently adapted, a reciprocal evolution, but imitation remains the
+primary means of acquisition.
 
-The individual's mastery of any technology necessarily involves stages of
-rote imitation. Though vanishingly few progress through these stages with an
+The individual's mastery of any technology necessarily involves stages of rote
+imitation. Though vanishingly few do progress through these stages with an
 alacrity that belies the technological aspect, the non-instinctual nature, it
 remains a process of wiring our brains and so implies repetition and
 assidiuously identifying and replicating salient details.
