@@ -118,7 +118,12 @@ The industrial mindset is dominated by the notion of the supply chain; fungible
 commodities are tranformed by turns into interchangable parts that are assembled
 into increasingly more complex constituents, ending in a finished product that
 performs a well-defined function in the service of humanity. A supply chain for
-making cars is not suddenly expected to produce toasters.
+making cars is not suddenly expected to produce toasters; it is a distributed
+solution to a specific problem.
+
+The supply chain can be seen an existence proof of a solution that seems more
+complicated than necessary; contrast it with manufacturing back when even the
+electricity was part of a monolithic, vertically integrated whole.
 
 The software industry's answer to the supply chain is microservices. Small teams
 focused on solving relatively small, well-defined constituent problems. Software
