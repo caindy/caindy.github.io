@@ -1,6 +1,7 @@
 
 Hyperobjects: An Architectural Style for the Event-Driven Enterprise
 ====================================================================
+> With objects, we must be concerned with how a computational object can change and yet maintain its identity. SICP
 
 Introduction
 ------------
