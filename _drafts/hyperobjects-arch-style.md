@@ -146,7 +146,11 @@ have employed the term "pit of success" to describe the intention of making the
 simple and correct approach the easiest to adopt.
 
 A key tenent of the Hyperobjects style is that pushing intelligence to the edges
-increases agility, and thus speed of execution.
+increases agility, and thus speed of execution. To that end we try to minimize the
+need for significant up-front design work, by focusing on [operationalizing](https://en.wikipedia.org/wiki/Operationalization) 
+the domain.
+
+
 
 ### Scalability and Reliability
 
@@ -205,9 +209,6 @@ stores.
 
 With Hyperobjects we try to define an architectural style that can serve as an
 organizing principle for the enterprise.
-
-### Cloud
-
 
 
 Defining the Constraints of the Hyperobjects Style 
