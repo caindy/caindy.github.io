@@ -129,7 +129,12 @@ to provide agility and specificity in the application layer.
 [Fostering serendipity](https://www.infoq.com/presentations/vinoski-rest-serendipity)
 means ensuring the data and commands clients require to acheive their goals are
 readily available without resorting to making goal-specific changes to our
-services.
+services. We hope to enable [stigmergy](https://en.wikipedia.org/wiki/Stigmergy) in the enterprise:
+
+> Stigmergy is a mechanism of indirect coordination, through the environment, between agents or actions.[1] The principle is that the trace left in the environment by an action stimulates the performance of a next action, by the same or a different agent. In that way, subsequent actions tend to reinforce and build on each other, leading to the spontaneous emergence of coherent, apparently systematic activity.
+
+>Stigmergy is a form of self-organization. It produces complex, seemingly intelligent structures, without need for any planning, control, or even direct communication between the agents. As such it supports efficient collaboration between extremely simple agents, who lack any memory, intelligence or even individual awareness of each other
+
 
 ### Simplicity and Ease of Implementation
 
