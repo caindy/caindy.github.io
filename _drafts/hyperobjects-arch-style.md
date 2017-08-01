@@ -73,13 +73,13 @@ cloud architectures. The primary constraints of this style are:
 * Event Time (ET): All Aggregate Roots provide uniform Event Time semantics
   for all Events and Representations, entailing time as a first-class property
   of all service interactions
-* Dynamic Query (DQ): Services must implement a uniform dynamic query interface
+* Interactive Query (IQ): Services must implement a uniform dynamic query interface
 * Layered + Cient-cache + Uniform Interface + Hypermedia constraint (Fielding)
 * Browsable API: Services _should_ provide a browser-based interface to
   interactive documentation
 
 _(If you are very familiar with Fielding, my feeble attempt at emulating
-his concision: **(Browsable) LC$U-DQ-3DR-I2-ET-CQRS+ES-UHE**)_
+his concision: **(Browsable) LC$U-IQ-3DR-I2-ET-CQRS+ES-UHE**)_
 
 The style is described at two levels: the System-level and the
 Service-level. The System-level describes the style as an enterprise
@@ -118,14 +118,16 @@ at least as accommodating, allowing reactivity across various silos.
 
 At the application level, new requirements often mean presenting existing
 functionality in slightly different ways: a different view on the same data, or
-a permutation of existing commands. Technologies like Falcor and Relay have
+a permutation of existing commands. Technologies like Falcor and GraphQL have
 ushered in so-called
 [demand-driven architecture](https://www.infoq.com/presentations/domain-driven-architecture),
 while companies like AWS and Netflix have shown the advantages of creating
 top-level services, ["experience-based
 apis"](http://www.danieljacobson.com/blog/306), that aggregate baseline services
 to provide agility and specificity in the application layer.
-
+jj
+#### TODO: [backends front ends](http://samnewman.io/patterns/architectural/bff/) [data sovreginty per service](https://docs.microsoft.com/en-us/dotnet/standard/microservices-architecture/architect-microservice-container-applications/data-sovereignty-per-microservice)
+#### [Microservices architectural style vs Hyperobjects architectural style](http://www.evernote.com/l/AAkWumkhQQZI1a6fAXdJ5Rfd6fNLsQla0Ak/)
 [Fostering serendipity](https://www.infoq.com/presentations/vinoski-rest-serendipity)
 means ensuring the data and commands clients require to acheive their goals are
 readily available without resorting to making goal-specific changes to our
@@ -214,7 +216,7 @@ organizing principle for the enterprise.
 Defining the Constraints of the Hyperobjects Style 
 ==================================================
 
-**(Browsable) LC$U-DQ-3DR-I2-ET-CQRS+ES-UHE**
+**(Browsable) LC$U-IQ-3DR-I2-ET-CQRS+ES-UHE**
 
 ### Domain Driven Design Resources
 
@@ -235,7 +237,9 @@ https://consumer-shopping-context.contoso.com/consumer-shopping-cart/42924579adk
         \--------- bounded context ---------/\---- aggregate ------/\--- aggregate root id ---/
 ```
 
-The primary benefit of this constraint is uniformity of implementation.
+A bounded context is the unit of availability in a Hyperobjects system.
+An aggregate root is the unit of consistency.
+An entity is the unit of logic.
 
 ### Event-Time
 
@@ -278,15 +282,21 @@ The mechanics of Intent composition will be discussed at length in later
 sections, but the salient point is that it **allows clients to synthesize new
 capability from existing commands without making changes to the service**.
 
-### Dynamic Query
+#### CRDTs
+
+What if all Intents were CRDT mutations?
+
+### Interactive Query
 
 Clients should be able to specify their own queries rather than being saddled
 with the singular representation format of the resources owned by a Hyperobject.
 Hyperobjects must implement a Query interface that allows clients to specify
 these in a request-response or persistent connection. For example, Hyperobjects
 in your enterprise may implement an interface that accepts OData or Falcor or
-Relay (or all three) queries, and they could also allow these over a websocket,
+GraphQL (or all three) queries, and they could also allow these over a websocket,
 allowing for streaming updates to the client.
+
+#### TODO: how to implement CQS in consumer-driven contracts world?
 
 ### Universal Hypermedia Events
 
@@ -303,7 +313,7 @@ state of the resource at processing time rather than at event time.
 
 For various reasons a company might choose polyglot SOA as an enterprise
 strategy, but the Uniform Interface constraint of Hyperobjects requires that
-each of these services meet the Interactive Intents, Dynamic Query, Universal
+each of these services meet the Interactive Intents, Interactive Query, Universal
 Hypermedia Events, and Event-Time constraints. These constraints collectively
 entail specific interaction and metdata semantics described later.
 
@@ -323,6 +333,9 @@ The interactive documentation of a Hyperobject is essentially a very simple
 classic web application that exercises the entire API in a sandboxed
 environment, providing documentation inline with the display of the sandboxed
 resources.
+
+#### Self-Contained Systems
+https://www.infoq.com/articles/scs-microservices-done-right
 
 ### REST?
 
@@ -531,9 +544,9 @@ Hyperobjects event store in Appendix B. Other presentations may refer to this
 store as a replicated event log, but I wish to emphasize that the requirements
 of the store may be satisfied by many backends.
 
-### Dynamic Query
+### Interactive Query
 
-Dynamic Query is a key constraint of this architectural style, but the exact
+Interactive Query is a key constraint of this architectural style, but the exact
 implementation described here is intended to be suggestive rather than
 prescriptive. The salient point is that a client can define a particular view
 over the data owned by a Hyperobject in a language that is uniformly supported
@@ -879,7 +892,8 @@ Implementation Dependencies
 ### Cache
 Process exclusive, LRU, thread-safe for read and write
 
-### Consisten Hash Routing
+### Consistent Hash Routing
+Ability to route to the correct node.
 
 ### Backing Store
 
