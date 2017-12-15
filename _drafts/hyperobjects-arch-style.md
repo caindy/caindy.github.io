@@ -241,6 +241,10 @@ A bounded context is the unit of availability in a Hyperobjects system.
 An aggregate root is the unit of consistency.
 An entity is the unit of logic.
 
+Aggregate root ids
+https://github.com/boundary/flake
+https://blog.twitter.com/engineering/en_us/a/2010/announcing-snowflake.html
+
 ### Event-Time
 
 Every Aggregate Root has it's own logical clock. As it changes, this clock is
